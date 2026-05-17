@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object para operações com Missões no banco de dados
+ * Data Access Object para gerenciar operações com Missões no banco de dados
  */
 public class MissaoDAO {
 
     /**
      * Lista todas as missões ordenadas por nível mínimo
-     * @return Lista de missões
-     * @throws SQLException se houver erro no banco
+     * @return Lista de todas as missões
+     * @throws SQLException se houver erro na query
      */
     public List<Missao> listarMissoes() throws SQLException {
         List<Missao> lista = new ArrayList<>();
@@ -29,8 +29,8 @@ public class MissaoDAO {
     /**
      * Salva ou atualiza o progresso de uma missão para um personagem
      * @param personagemId ID do personagem
-     * @param m Objeto Missao com dados de progresso
-     * @throws SQLException se houver erro no banco
+     * @param m Missão com dados de progresso
+     * @throws SQLException se houver erro na operação
      */
     public void salvarProgresso(int personagemId, Missao m) throws SQLException {
         String check = "SELECT id FROM progresso_missao WHERE personagem_id=? AND missao_id=?";
@@ -79,11 +79,11 @@ public class MissaoDAO {
     }
 
     /**
-     * Carrega o progresso de uma missão específica para um personagem
+     * Carrega o progresso de uma missão para um personagem específico
      * @param personagemId ID do personagem
      * @param missaoId ID da missão
-     * @return Objeto Missao com dados de progresso carregado, ou null se não existir
-     * @throws SQLException se houver erro no banco
+     * @return Missão com progresso carregado, ou null se não existir
+     * @throws SQLException se houver erro na query
      */
     public Missao carregarProgresso(int personagemId, int missaoId) throws SQLException {
         String sql = """
@@ -113,9 +113,9 @@ public class MissaoDAO {
 
     /**
      * Mapeia um ResultSet para um objeto Missao
-     * @param rs ResultSet contendo dados da missão
-     * @return Objeto Missao preenchido com dados do ResultSet
-     * @throws SQLException se houver erro ao extrair dados
+     * @param rs ResultSet com dados de missão
+     * @return Objeto Missao preenchido
+     * @throws SQLException se houver erro ao ler o ResultSet
      */
     private Missao mapear(ResultSet rs) throws SQLException {
         Missao m = new Missao();
