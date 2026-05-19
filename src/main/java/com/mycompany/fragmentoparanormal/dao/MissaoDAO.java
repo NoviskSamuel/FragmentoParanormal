@@ -1,23 +1,15 @@
 package com.mycompany.fragmentoparanormal.dao;
 
 import com.mycompany.fragmentoparanormal.model.Missao;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Data Access Object para a classe Missao
- * Responsável por todas as operações de banco de dados relacionadas a Missões
  */
 public class MissaoDAO {
 
-    /**
-     * Lista todas as missões ordenadas por nível mínimo
-     * 
-     * @return Lista de todas as missões
-     * @throws SQLException se houver erro na consulta
-     */
     public List<Missao> listarMissoes() throws SQLException {
         List<Missao> lista = new ArrayList<>();
         String sql = "SELECT * FROM missao ORDER BY nivel_minimo";
@@ -28,14 +20,6 @@ public class MissaoDAO {
         return lista;
     }
 
-    /**
-     * Salva o progresso de um personagem em uma missão
-     * Se o progresso não existe, insere; se existe, atualiza
-     * 
-     * @param personagemId ID do personagem
-     * @param m Objeto Missao com dados atualizados
-     * @throws SQLException se houver erro na operação
-     */
     public void salvarProgresso(int personagemId, Missao m) throws SQLException {
         String check = "SELECT id FROM progresso_missao WHERE personagem_id=? AND missao_id=?";
         try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(check)) {
@@ -43,12 +27,7 @@ public class MissaoDAO {
             ps.setInt(2, m.getId());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                String upd = """
-                    UPDATE progresso_missao SET
-                      progresso_atual=?, sala_atual=?, concluida=?,
-                      vezes_retornou=?, fugiu=?
-                    WHERE personagem_id=? AND missao_id=?
-                    """;
+                String upd = "UPDATE progresso_missao SET progresso_atual=?, sala_atual=?, concluida=?, vezes_retornou=?, fugiu=? WHERE personagem_id=? AND missao_id=?";
                 try (PreparedStatement u = ConexaoDB.getConexao().prepareStatement(upd)) {
                     u.setInt(1, m.getProgressoAtual());
                     u.setInt(2, m.getSalaAtual());
@@ -60,12 +39,7 @@ public class MissaoDAO {
                     u.executeUpdate();
                 }
             } else {
-                String ins = """
-                    INSERT INTO progresso_missao
-                    (personagem_id, missao_id, progresso_atual, sala_atual,
-                     concluida, vezes_retornou, fugiu)
-                    VALUES (?,?,?,?,?,?,?)
-                    """;
+                String ins = "INSERT INTO progresso_missao (personagem_id, missao_id, progresso_atual, sala_atual, concluida, vezes_retornou, fugiu) VALUES (?,?,?,?,?,?,?)";
                 try (PreparedStatement i = ConexaoDB.getConexao().prepareStatement(ins)) {
                     i.setInt(1, personagemId);
                     i.setInt(2, m.getId());
@@ -80,23 +54,8 @@ public class MissaoDAO {
         }
     }
 
-    /**
-     * Carrega o progresso de um personagem em uma missão específica
-     * 
-     * @param personagemId ID do personagem
-     * @param missaoId ID da missão
-     * @return Objeto Missao com os dados de progresso preenchidos
-     * @throws SQLException se houver erro na consulta
-     */
     public Missao carregarProgresso(int personagemId, int missaoId) throws SQLException {
-        String sql = """
-            SELECT m.*, pm.progresso_atual, pm.sala_atual,
-                   pm.concluida, pm.vezes_retornou, pm.fugiu
-            FROM missao m
-            LEFT JOIN progresso_missao pm
-              ON m.id = pm.missao_id AND pm.personagem_id = ?
-            WHERE m.id = ?
-            """;
+        String sql = "SELECT m.*, pm.progresso_atual, pm.sala_atual, pm.concluida, pm.vezes_retornou, pm.fugiu FROM missao m LEFT JOIN progresso_missao pm ON m.id = pm.missao_id AND pm.personagem_id = ? WHERE m.id = ?";
         try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(sql)) {
             ps.setInt(1, personagemId);
             ps.setInt(2, missaoId);
@@ -114,13 +73,6 @@ public class MissaoDAO {
         return null;
     }
 
-    /**
-     * Método auxiliar para mapear um ResultSet para um objeto Missao
-     * 
-     * @param rs ResultSet com dados da missão
-     * @return Objeto Missao preenchido com dados do ResultSet
-     * @throws SQLException se houver erro ao acessar o ResultSet
-     */
     private Missao mapear(ResultSet rs) throws SQLException {
         Missao m = new Missao();
         m.setId(rs.getInt("id"));

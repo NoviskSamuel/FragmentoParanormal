@@ -1,7 +1,7 @@
 package com.mycompany.fragmentoparanormal.model;
 
 /**
- * Classe modelo para representar uma Missão no jogo
+ * Classe modelo para Missão do sistema
  */
 public class Missao {
     private int id;
@@ -17,10 +17,11 @@ public class Missao {
     private int vezesRetornou;
     private boolean fugiu;
 
+    // Construtores
     public Missao() {
     }
 
-    public Missao(int id, String titulo, String descricao, String objetivo,
+    public Missao(int id, String titulo, String descricao, String objetivo, 
                   int totalObjetivo, int nivelMinimo, int totalSalas) {
         this.id = id;
         this.titulo = titulo;
@@ -36,48 +37,118 @@ public class Missao {
         this.fugiu = false;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    // Getters e Setters
+    public int getId() {
+        return id;
+    }
 
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getDescricao() { return descricao; }
-    public void setDescricao(String descricao) { this.descricao = descricao; }
+    public String getTitulo() {
+        return titulo;
+    }
 
-    public String getObjetivo() { return objetivo; }
-    public void setObjetivo(String objetivo) { this.objetivo = objetivo; }
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 
-    public int getTotalObjetivo() { return totalObjetivo; }
-    public void setTotalObjetivo(int totalObjetivo) { this.totalObjetivo = totalObjetivo; }
+    public String getDescricao() {
+        return descricao;
+    }
 
-    public int getNivelMinimo() { return nivelMinimo; }
-    public void setNivelMinimo(int nivelMinimo) { this.nivelMinimo = nivelMinimo; }
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
 
-    public int getTotalSalas() { return totalSalas; }
-    public void setTotalSalas(int totalSalas) { this.totalSalas = totalSalas; }
+    public String getObjetivo() {
+        return objetivo;
+    }
 
-    public int getProgressoAtual() { return progressoAtual; }
-    public void setProgressoAtual(int progressoAtual) { this.progressoAtual = progressoAtual; }
+    public void setObjetivo(String objetivo) {
+        this.objetivo = objetivo;
+    }
 
-    public int getSalaAtual() { return salaAtual; }
-    public void setSalaAtual(int salaAtual) { this.salaAtual = salaAtual; }
+    public int getTotalObjetivo() {
+        return totalObjetivo;
+    }
 
-    public boolean isConcluida() { return concluida; }
-    public void setConcluida(boolean concluida) { this.concluida = concluida; }
+    public void setTotalObjetivo(int totalObjetivo) {
+        this.totalObjetivo = totalObjetivo;
+    }
 
-    public int getVezesRetornou() { return vezesRetornou; }
-    public void setVezesRetornou(int vezesRetornou) { this.vezesRetornou = vezesRetornou; }
+    public int getNivelMinimo() {
+        return nivelMinimo;
+    }
 
-    public boolean isFugiu() { return fugiu; }
-    public void setFugiu(boolean fugiu) { this.fugiu = fugiu; }
+    public void setNivelMinimo(int nivelMinimo) {
+        this.nivelMinimo = nivelMinimo;
+    }
+
+    public int getTotalSalas() {
+        return totalSalas;
+    }
+
+    public void setTotalSalas(int totalSalas) {
+        this.totalSalas = totalSalas;
+    }
+
+    public int getProgressoAtual() {
+        return progressoAtual;
+    }
+
+    public void setProgressoAtual(int progressoAtual) {
+        this.progressoAtual = progressoAtual;
+    }
+
+    public int getSalaAtual() {
+        return salaAtual;
+    }
+
+    public void setSalaAtual(int salaAtual) {
+        this.salaAtual = salaAtual;
+    }
+
+    public boolean isConcluida() {
+        return concluida;
+    }
+
+    public void setConcluida(boolean concluida) {
+        this.concluida = concluida;
+    }
+
+    public int getVezesRetornou() {
+        return vezesRetornou;
+    }
+
+    public void setVezesRetornou(int vezesRetornou) {
+        this.vezesRetornou = vezesRetornou;
+    }
+
+    public boolean isFugiu() {
+        return fugiu;
+    }
+
+    public void setFugiu(boolean fugiu) {
+        this.fugiu = fugiu;
+    }
 
     @Override
     public String toString() {
         return "Missao{" +
                 "id=" + id +
                 ", titulo='" + titulo + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", objetivo='" + objetivo + '\'' +
+                ", totalObjetivo=" + totalObjetivo +
+                ", nivelMinimo=" + nivelMinimo +
+                ", totalSalas=" + totalSalas +
+                ", progressoAtual=" + progressoAtual +
+                ", salaAtual=" + salaAtual +
                 ", concluida=" + concluida +
+                ", vezesRetornou=" + vezesRetornou +
+                ", fugiu=" + fugiu +
                 '}';
     }
 }
