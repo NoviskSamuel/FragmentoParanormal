@@ -1,11 +1,14 @@
 package com.mycompany.fragmentoparanormal.dao;
 
-import br.edu.fragmento.model.Missao;
+import com.mycompany.fragmentoparanormal.model.Missao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object para a classe Missao
+ */
 public class MissaoDAO {
 
     public List<Missao> listarMissoes() throws SQLException {
@@ -25,13 +28,7 @@ public class MissaoDAO {
             ps.setInt(2, m.getId());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                // atualiza
-                String upd = """
-                    UPDATE progresso_missao SET
-                      progresso_atual=?, sala_atual=?, concluida=?,
-                      vezes_retornou=?, fugiu=?
-                    WHERE personagem_id=? AND missao_id=?
-                    """;
+                String upd = "UPDATE progresso_missao SET progresso_atual=?, sala_atual=?, concluida=?, vezes_retornou=?, fugiu=? WHERE personagem_id=? AND missao_id=?";
                 try (PreparedStatement u = ConexaoDB.getConexao().prepareStatement(upd)) {
                     u.setInt(1, m.getProgressoAtual());
                     u.setInt(2, m.getSalaAtual());
@@ -43,13 +40,7 @@ public class MissaoDAO {
                     u.executeUpdate();
                 }
             } else {
-                // insere
-                String ins = """
-                    INSERT INTO progresso_missao
-                    (personagem_id, missao_id, progresso_atual, sala_atual,
-                     concluida, vezes_retornou, fugiu)
-                    VALUES (?,?,?,?,?,?,?)
-                    """;
+                String ins = "INSERT INTO progresso_missao (personagem_id, missao_id, progresso_atual, sala_atual, concluida, vezes_retornou, fugiu) VALUES (?,?,?,?,?,?,?)";
                 try (PreparedStatement i = ConexaoDB.getConexao().prepareStatement(ins)) {
                     i.setInt(1, personagemId);
                     i.setInt(2, m.getId());
@@ -65,14 +56,7 @@ public class MissaoDAO {
     }
 
     public Missao carregarProgresso(int personagemId, int missaoId) throws SQLException {
-        String sql = """
-            SELECT m.*, pm.progresso_atual, pm.sala_atual,
-                   pm.concluida, pm.vezes_retornou, pm.fugiu
-            FROM missao m
-            LEFT JOIN progresso_missao pm
-              ON m.id = pm.missao_id AND pm.personagem_id = ?
-            WHERE m.id = ?
-            """;
+        String sql = "SELECT m.*, pm.progresso_atual, pm.sala_atual, pm.concluida, pm.vezes_retornou, pm.fugiu FROM missao m LEFT JOIN progresso_missao pm ON m.id = pm.missao_id AND pm.personagem_id = ? WHERE m.id = ?";
         try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(sql)) {
             ps.setInt(1, personagemId);
             ps.setInt(2, missaoId);
