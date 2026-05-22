@@ -174,4 +174,3 @@ public class Personagem {
     public void setInventario(Inventario inventario)
     { this.inventario = inventario; }
 }
-}

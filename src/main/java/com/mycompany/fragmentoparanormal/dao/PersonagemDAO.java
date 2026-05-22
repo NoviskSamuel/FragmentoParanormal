@@ -1,10 +1,9 @@
 package com.mycompany.fragmentoparanormal.dao;
 
-import br.edu.fragmento.model.Personagem;
-import br.edu.fragmento.model.enums.Classe;
-import br.edu.fragmento.model.enums.Elemento;
-import br.edu.fragmento.model.enums.Genero;
-
+import com.mycompany.fragmentoparanormal.enums.Classe;
+import com.mycompany.fragmentoparanormal.enums.Elemento;
+import com.mycompany.fragmentoparanormal.enums.Genero;
+import com.mycompany.fragmentoparanormal.model.Personagem;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.mycompany.fragmentoparanormal.dao;
 
-import br.edu.fragmento.model.Item;
+import com.mycompany.fragmentoparanormal.model.Item;
 
 import java.sql.*;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package com.mycompany.fragmentoparanormal.dao;
 
-import com.mycompany.fragmentoparanormal.model;
+import com.mycompany.fragmentoparanormal.model.Ranking;
 
 import java.sql.*;
 import java.util.ArrayList;
