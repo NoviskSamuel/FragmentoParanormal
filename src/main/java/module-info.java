@@ -4,11 +4,17 @@ module com.mycompany.fragmentoparanormal {
     requires javafx.fxml;
     requires java.base;
 
-    opens com.mycompany.fragmentoparanormal to javafx.fxml;
-    opens com.mycompany.fragmentoparanormal.model to javafx.fxml;
-    opens com.mycompany.fragmentoparanormal.dao to javafx.fxml;
-    
-    exports com.mycompany.fragmentoparanormal;
-    exports com.mycompany.fragmentoparanormal.model;
-    exports com.mycompany.fragmentoparanormal.dao;
+    opens Default to javafx.fxml;
+    opens Controller to javafx.fxml;
+    opens Util to javafx.fxml;
+    opens Graphics to javafx.fxml;
+    opens Model to javafx.fxml;
+    opens Dao to javafx.fxml;
+
+    exports Default;
+    exports Controller;
+    exports Model;
+    exports Dao;
+    exports Util;
+    exports Graphics;
 }
