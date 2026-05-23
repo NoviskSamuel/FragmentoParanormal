@@ -2,202 +2,326 @@ package Controller;
 
 import Dao.MissaoDAO;
 import Dao.PersonagemDAO;
+import Dao.RankingDAO;
 import Graphics.SpriteManager;
+import Model.Batalha;
 import Model.Inimigo;
 import Model.Item;
 import Model.Missao;
 import Model.Personagem;
+import Util.AcaoBatalha;
+import Util.Elemento;
 import Util.ScreenManager;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Random;
 
 public class MissaoController {
 
-    // ── FXML ───────────────────────────────────────────────────────────────
-    @FXML private Label labelTituloMissao;
-    @FXML private Label labelObjetivo;
-    @FXML private Label labelSala;
-    @FXML private Label labelVida;
-    @FXML private Label labelNarrative;
+    @FXML private Label     labelTitulo;
+    @FXML private Label     labelObjetivo;
+    @FXML private Label     labelSala;
+    @FXML private Label     labelVida;
+    @FXML private Label     labelVidaInimigo;
+    @FXML private Label     labelNarrative;
+    @FXML private Label     labelFragmento;
+
     @FXML private ImageView imgPersonagem;
-    @FXML private ImageView imgJumpscare;   // sobreposto, invisible por padrão
-    @FXML private HBox painelAcoes;         // botões de ação normal
-    @FXML private HBox painelBatalha;       // botões de batalha (hidden inicialmente)
-    @FXML private VBox painelItem;          // aparece quando encontra item
+    @FXML private ImageView imgInimigo;
+    @FXML private ImageView imgJumpscare;
+
+    @FXML private HBox painelAcoesMissao;
+    @FXML private HBox painelBatalha;
+
+    @FXML private VBox painelItem;
     @FXML private Label labelItemEncontrado;
-    @FXML private Label labelFragmento;     // carta do fragmento
+    @FXML private Label labelItemDesc;
 
-    // ── Estado ─────────────────────────────────────────────────────────────
     private Personagem jogador;
-    private Missao missao;
-    private Inimigo inimigoAtual;
-    private final Random rand = new Random();
+    private Missao     missao;
+    private Batalha    batalhaAtual;
+    private int        inimigosMortos = 0;
+    private int        moedasSessao   = 0;
 
-    // ── Init ───────────────────────────────────────────────────────────────
+    private static final Random RAND = new Random();
+
     @FXML
     public void initialize() {
         jogador = ScreenManager.getInstance().getPersonagemAtivo();
         missao  = ScreenManager.getInstance().getMissaoAtiva();
 
-        labelTituloMissao.setText(missao.getTitulo());
-        atualizarHUD();
-        painelBatalha.setVisible(false);
-        painelItem.setVisible(false);
-        imgJumpscare.setVisible(false);
-
         SpriteManager.getInstance().setSprite(imgPersonagem, jogador.getImagemPath());
         SpriteManager.getInstance().animarIdle(imgPersonagem);
 
-        labelNarrative.setText("Você entrou na missão. Avance com cuidado, Agente.");
+        imgJumpscare.setVisible(false);
+        imgJumpscare.setOpacity(0);
+        imgInimigo.setVisible(false);
+
+        setBatalhaVisivel(false);
+        painelItem.setVisible(false);
+
+        atualizarHUD();
+        labelNarrative.setText("Você chegou ao local. Avance com cuidado, Agente " + jogador.getNome() + ".");
     }
 
-    // ── HUD ────────────────────────────────────────────────────────────────
     private void atualizarHUD() {
-        labelObjetivo.setText(
-            missao.getObjetivo() + ": " + missao.getProgressoAtual() +
-            "/" + missao.getTotalObjetivo()
-        );
-        labelSala.setText("Sala " + missao.getSalaAtual() + "/" + missao.getTotalSalas());
-        labelVida.setText("❤ " + jogador.getVidaAtual() + "/" + jogador.getVidaMaxima());
+        labelTitulo.setText(missao.getTitulo());
+        labelObjetivo.setText("Objetivo: " + missao.getObjetivo() + " — " + missao.getProgressoTexto());
+        labelSala.setText("Sala " + missao.getSalaAtual() + " / " + missao.getTotalSalas());
+        labelVida.setText("❤ " + jogador.getVidaAtual() + " / " + jogador.getVidaMaxima());
+        labelFragmento.setText("📜 Fragmentos: " + missao.getProgressoTexto());
     }
-
-    // ── Ações do jogador ───────────────────────────────────────────────────
 
     @FXML
     private void onAvancar() {
-        missao.setSalaAtual(missao.getSalaAtual() + 1);
+        if (missao.ultimaSala()) {
+            labelNarrative.setText("Você chegou ao fim da área. Nenhum fragmento restante foi encontrado.");
+            return;
+        }
+        missao.avancarSala();
         atualizarHUD();
         gerarEvento();
     }
 
     @FXML
     private void onInvestigar() {
-        int chance = 20 + jogador.getInvestigacao();
-        if (rand.nextInt(100) < chance) {
-            // Encontrou item
-            Item item = gerarItemAleatorio();
+        int chance = Math.min(90, 20 + jogador.getInvestigacao() * 2);
+        if (RAND.nextInt(100) < chance) {
+            Item item = gerarItem();
             jogador.getInventario().adicionarItem(item);
-            labelItemEncontrado.setText("Encontrou: " + item.getNome() + "\n" + item.getDescricao());
+            labelItemEncontrado.setText("🔍 Encontrou: " + item.getNome());
+            labelItemDesc.setText(item.getDescricao());
             painelItem.setVisible(true);
-            labelNarrative.setText("Sua investigação revelou algo...");
 
-            // Se é fragmento, atualiza progresso
-            if ("FRAGMENTO".equalsIgnoreCase(item.getTipo())) {
-                missao.setProgressoAtual(missao.getProgressoAtual() + 1);
-                labelFragmento.setText("📜 Fragmento coletado! (" +
-                    missao.getProgressoAtual() + "/" + missao.getTotalObjetivo() + ")");
+            if (item.isFragmento()) {
+                missao.incrementarProgresso();
+                atualizarHUD();
                 verificarConclusao();
             }
+            if (item.isPocao()) {
+                jogador.curar(item.getValor());
+                atualizarHUD();
+                labelItemDesc.setText(item.getDescricao() + "\n✅ Vida restaurada! +" + item.getValor());
+            }
         } else {
-            labelNarrative.setText("Você investigou a sala mas não encontrou nada além de sombras.");
+            labelNarrative.setText("Você varreu a sala cuidadosamente, mas não encontrou nada.");
         }
-        atualizarHUD();
     }
 
-    @FXML
-    private void onFecharItem() {
-        painelItem.setVisible(false);
-    }
+    @FXML private void onFecharItem() { painelItem.setVisible(false); }
 
     @FXML
-    private void onFugir() {
+    private void onFugirMissao() {
         missao.setFugiu(true);
         missao.setVezesRetornou(missao.getVezesRetornou() + 1);
         salvarProgresso();
-        labelNarrative.setText("Você fugiu. O progresso foi salvo, mas os inimigos ficaram mais fortes...");
-        ScreenManager.getInstance().irSemHistorico(ScreenManager.TELA_MISSOES);
+        try {
+            new RankingDAO().registrarPartida(
+                jogador.getId(), missao.getId(), "FUGA", inimigosMortos, moedasSessao);
+        } catch (SQLException ignored) {}
+        labelNarrative.setText("🏃 Você fugiu. Progresso salvo. Ao retornar, os inimigos estarão mais fortes.");
+        PauseTransition pausa = new PauseTransition(Duration.seconds(2));
+        pausa.setOnFinished(e -> ScreenManager.getInstance().irSemHistorico(ScreenManager.TELA_MISSOES));
+        pausa.play();
     }
+
+    @FXML private void onInventario() { ScreenManager.getInstance().ir(ScreenManager.TELA_INVENTARIO); }
+
+    @FXML private void onAtacar()      { executarBatalha(AcaoBatalha.ATACAR); }
+    @FXML private void onRitual()      { executarBatalha(AcaoBatalha.USAR_RITUAL); }
+    @FXML private void onEquiparArma() { executarBatalha(AcaoBatalha.EQUIPAR_ARMA); }
 
     @FXML
-    private void onInventario() {
-        ScreenManager.getInstance().ir(ScreenManager.TELA_INVENTARIO);
+    private void onFugirBatalha() {
+        executarBatalha(AcaoBatalha.FUGIR);
     }
 
-    // ── Batalha ───────────────────────────────────────────────────────────
+    private void executarBatalha(AcaoBatalha acao) {
+        if (batalhaAtual == null || !batalhaAtual.isEmAndamento()) return;
 
-    private void iniciarBatalha(Inimigo inimigo) {
-        this.inimigoAtual = inimigo;
-        ScreenManager.getInstance().setMissaoAtiva(missao);
-        // Passa o inimigo via contexto e navega
-        // (Usamos uma variável temporária estática simples)
-        BatalhaController.setInimigoAtual(inimigo);
-        ScreenManager.getInstance().ir(ScreenManager.TELA_BATALHA);
+        SpriteManager.getInstance().animarAtaque(imgPersonagem, null);
+
+        String log = batalhaAtual.executarAcao(acao);
+        labelNarrative.setText(log);
+
+        if (batalhaAtual.getInimigo().getVidaAtual() < batalhaAtual.getInimigo().getVidaMaxima()) {
+            SpriteManager.getInstance().animarDano(imgInimigo);
+        }
+
+        if (jogador.getVidaAtual() < jogador.getVidaMaxima()) {
+            SpriteManager.getInstance().animarDano(imgPersonagem);
+        }
+
+        atualizarHUD();
+        atualizarVidaInimigo();
+
+        if (!batalhaAtual.isEmAndamento()) {
+            processarFimDeBatalha();
+        }
     }
 
-    // ── Geração de eventos ────────────────────────────────────────────────
+    private void processarFimDeBatalha() {
+        if (batalhaAtual.jogadorVenceu()) {
+            inimigosMortos++;
+            moedasSessao += batalhaAtual.getInimigo().getMoedasDrop();
+
+            List<Item> pool = List.of(
+                new Item("Faca Enferrujada",   "ARMA",      8,  "Uma faca velha mas ainda cortante."),
+                new Item("Fragmento do Diário","FRAGMENTO", 0,  "Uma página rasgada do diário perdido."),
+                new Item("Poção de Ervas",      "POCAO",    25, "Restaura 25 pontos de vida."),
+                new Item("Amuleto Sombrio",     "RITUAL",   12, "Amplifica poder paranormal em rituais.")
+            );
+            Item drop = batalhaAtual.rolarDrop(pool);
+            if (drop != null) {
+                jogador.getInventario().adicionarItem(drop);
+                labelItemEncontrado.setText("🎁 Drop: " + drop.getNome());
+                labelItemDesc.setText(drop.getDescricao());
+                painelItem.setVisible(true);
+                if (drop.isFragmento()) {
+                    missao.incrementarProgresso();
+                }
+                if (drop.isPocao()) jogador.curar(drop.getValor());
+            }
+
+            SpriteManager.getInstance().animarMorte(imgInimigo, () -> {
+                imgInimigo.setVisible(false);
+                setBatalhaVisivel(false);
+                atualizarHUD();
+                verificarConclusao();
+                if (!missao.objetivoConcluido()) {
+                    labelNarrative.setText("Inimigo derrotado! Continue avançando.");
+                }
+            });
+            salvarProgresso();
+
+        } else if (batalhaAtual.jogadorMorreu()) {
+            SpriteManager.getInstance().animarMorte(imgPersonagem, () -> {
+                missao.setProgressoAtual(0);
+                missao.setSalaAtual(0);
+                missao.setFugiu(false);
+                missao.setVezesRetornou(0);
+                salvarProgresso();
+                try {
+                    new RankingDAO().registrarPartida(
+                        jogador.getId(), missao.getId(), "MORTE", inimigosMortos, moedasSessao);
+                } catch (SQLException ignored) {}
+                PauseTransition p = new PauseTransition(Duration.seconds(2));
+                p.setOnFinished(e -> ScreenManager.getInstance().irSemHistorico(ScreenManager.TELA_MISSOES));
+                p.play();
+            });
+
+        } else if (batalhaAtual.jogadorFugiu()) {
+            imgInimigo.setVisible(false);
+            setBatalhaVisivel(false);
+            labelNarrative.setText("Você fugiu da batalha!");
+        }
+    }
 
     private void gerarEvento() {
-        int rolagem = rand.nextInt(100);
-
-        if (rolagem < 50) {
-            // Inimigo!
-            Inimigo inimigo = gerarInimigoAleatorio();
-            // Escalar se voltou após fuga
+        int r = RAND.nextInt(100);
+        if (r < 55) {
+            Inimigo inimigo = gerarInimigo();
             if (missao.isFugiu() && missao.getVezesRetornou() > 0) {
-                inimigo.escalar(1.0 + 0.2 * missao.getVezesRetornou());
+                inimigo.escalar(1.0 + 0.25 * missao.getVezesRetornou());
             }
-            // JUMPSCARE primeiro, depois batalha
             String jumpPath = inimigo.getImagemJumpscare() != null
-                ? inimigo.getImagemJumpscare()
-                : inimigo.getImagemPath();
+                ? inimigo.getImagemJumpscare() : inimigo.getImagemPath();
             SpriteManager.getInstance().exibirJumpscare(imgJumpscare, jumpPath,
                 () -> iniciarBatalha(inimigo));
-        } else if (rolagem < 75) {
-            labelNarrative.setText("A sala está vazia. Apenas o vento uiva nas paredes.");
+        } else if (r < 75) {
+            labelNarrative.setText("A sala está vazia. Apenas ecos e sombras...");
         } else {
-            // Item aleatório
             onInvestigar();
         }
     }
 
-    private Inimigo gerarInimigoAleatorio() {
-        String[] nomes = {"Sombra Errante", "Espírito Maligno", "Criatura das Trevas", "Fantasma Raivoso"};
-        String[] imgs  = {"/images/inimigos/sombra.png", "/images/inimigos/espirito.png",
-                          "/images/inimigos/criatura.png", "/images/inimigos/fantasma.png"};
-        int i = rand.nextInt(nomes.length);
-        int fator = missao.getSalaAtual();
-               Inimigo in = new Inimigo(nomes[i],
-            Util.Elemento.SOMBRA,
-            fator, 8 + fator * 2, 30 + fator * 10, 20 + fator * 5);
+    private void iniciarBatalha(Inimigo inimigo) {
+        batalhaAtual = new Batalha(jogador, inimigo);
+        SpriteManager.getInstance().setSprite(imgInimigo, inimigo.getImagemPath());
+        imgInimigo.setVisible(true);
+        imgInimigo.setOpacity(1.0);
+        atualizarVidaInimigo();
+        setBatalhaVisivel(true);
+        labelNarrative.setText("⚔ " + inimigo.getNome() + " apareceu! O que você vai fazer?");
+    }
 
-        in.setImagemPath(imgs[i]);
-        in.setImagemJumpscare(imgs[i].replace(".png", "_jump.png"));
+    private void atualizarVidaInimigo() {
+        if (batalhaAtual != null) {
+            Inimigo in = batalhaAtual.getInimigo();
+            labelVidaInimigo.setText("👾 " + in.getNome() +
+                "  ❤ " + in.getVidaAtual() + "/" + in.getVidaMaxima());
+        }
+    }
+
+    private void setBatalhaVisivel(boolean visivel) {
+        painelBatalha.setVisible(visivel);
+        painelAcoesMissao.setVisible(!visivel);
+        labelVidaInimigo.setVisible(visivel);
+    }
+
+    private Inimigo gerarInimigo() {
+        record Cfg(String nome, String img) {}
+        List<Cfg> tipos = List.of(
+            new Cfg("Sombra Errante",     "/fragmentoparanormal/images/inimigos/sombra.png"),
+            new Cfg("Espírito Maligno",   "/fragmentoparanormal/images/inimigos/espirito.png"),
+            new Cfg("Criatura das Trevas","/fragmentoparanormal/images/inimigos/criatura.png"),
+            new Cfg("Fantasma Raivoso",   "/fragmentoparanormal/images/inimigos/fantasma.png")
+        );
+        Cfg c   = tipos.get(RAND.nextInt(tipos.size()));
+        int sal = Math.max(1, missao.getSalaAtual());
+        Inimigo in = new Inimigo(c.nome(), Elemento.NEUTRO,
+            sal, 6 + sal * 2, 25 + sal * 8, 15 + sal * 5);
+        in.setImagemPath(c.img());
+        in.setImagemJumpscare(c.img().replace(".png", "_jump.png"));
         return in;
     }
 
-    private Item gerarItemAleatorio() {
-        String[][] itens = {
-            {"Faca Enferrujada", "ARMA", "5", "Uma faca velha mas ainda cortante."},
-            {"Fragmento do Diário", "FRAGMENTO", "0", "Uma página rasgada do diário perdido."},
-            {"Poção de Ervas", "POCAO", "30", "Restaura 30 pontos de vida."},
-            {"Amuleto Sombrio", "RITUAL", "15", "Amplifica poder paranormal."}
-        };
-        int i = rand.nextInt(itens.length);
-        return new Item(itens[i][0], itens[i][1],
-            Integer.parseInt(itens[i][2]), itens[i][3]);
+    private Item gerarItem() {
+        int r = RAND.nextInt(100);
+        if (r < 40)       return new Item("Fragmento do Diário", "FRAGMENTO", 0, "Uma página rasgada do diário perdido.");
+        else if (r < 60)  return new Item("Poção de Ervas",       "POCAO",    30, "Restaura 30 pontos de vida.");
+        else if (r < 80)  return new Item("Faca Enferrujada",     "ARMA",     8,  "Uma faca velha mas ainda cortante.");
+        else               return new Item("Amuleto Sombrio",     "RITUAL",   12, "Amplifica rituais paranormais.");
     }
 
     private void verificarConclusao() {
-        if (missao.getProgressoAtual() >= missao.getTotalObjetivo()) {
+        if (missao.objetivoConcluido()) {
             missao.setConcluida(true);
             salvarProgresso();
-            // Level up: ganhar XP
-            jogador.ganharXP(150 + missao.getNivelMinimo() * 50);
+            boolean subiuNivel = jogador.ganharXP(200 + missao.getNivelMinimo() * 80);
+            jogador.setMoedas(jogador.getMoedas() + moedasSessao);
             salvarPersonagem();
-            labelNarrative.setText("🏆 MISSÃO CONCLUÍDA! Você coletou todos os fragmentos!");
-            // Navega para tela de level up
-            ScreenManager.getInstance().ir(ScreenManager.TELA_LEVEL_UP);
+            try {
+                new RankingDAO().registrarPartida(
+                    jogador.getId(), missao.getId(), "VITORIA", inimigosMortos, moedasSessao);
+            } catch (SQLException ignored) {}
+
+            labelNarrative.setText("🏆 MISSÃO CONCLUÍDA!\nTodos os fragmentos foram coletados!");
+            PauseTransition p = new PauseTransition(Duration.seconds(2));
+            if (subiuNivel) {
+                p.setOnFinished(e -> ScreenManager.getInstance().ir(ScreenManager.TELA_LEVEL_UP));
+            } else {
+                p.setOnFinished(e -> ScreenManager.getInstance().irSemHistorico(ScreenManager.TELA_MISSOES));
+            }
+            p.play();
         }
     }
 
     private void salvarProgresso() {
-        new MissaoDAO().atualizarProgresso(missao);
+        if (jogador == null || missao == null) return;
+        try {
+            new MissaoDAO().salvarProgresso(jogador.getId(), missao);
+        } catch (SQLException e) {
+            System.err.println("Erro ao salvar progresso: " + e.getMessage());
+        }
     }
 
     private void salvarPersonagem() {

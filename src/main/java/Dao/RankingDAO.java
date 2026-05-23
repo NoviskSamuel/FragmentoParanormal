@@ -14,10 +14,13 @@ public class RankingDAO {
             SELECT p.nome, p.nivel, p.moedas,
                    COALESCE(m.titulo, 'Nenhuma') AS missao_atual,
                    COALESCE(
-                     (SELECT SUM(inimigos_mortos) FROM historico_partida WHERE personagem_id = p.id), 0
+                     (SELECT SUM(inimigos_mortos)
+                      FROM historico_partida
+                      WHERE personagem_id = p.id), 0
                    ) AS inimigos_abatidos
             FROM personagem p
-            LEFT JOIN progresso_missao pm ON pm.personagem_id = p.id AND pm.concluida = FALSE
+            LEFT JOIN progresso_missao pm
+              ON pm.personagem_id = p.id AND pm.concluida = FALSE
             LEFT JOIN missao m ON m.id = pm.missao_id
             ORDER BY p.nivel DESC, p.moedas DESC
             LIMIT 20
@@ -48,11 +51,11 @@ public class RankingDAO {
             VALUES (?,?,?,?,?)
             """;
         try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(sql)) {
-            ps.setInt(1, personagemId);
-            ps.setInt(2, missaoId);
+            ps.setInt(1,    personagemId);
+            ps.setInt(2,    missaoId);
             ps.setString(3, resultado);
-            ps.setInt(4, inimigos);
-            ps.setInt(5, moedas);
+            ps.setInt(4,    inimigos);
+            ps.setInt(5,    moedas);
             ps.executeUpdate();
         }
     }

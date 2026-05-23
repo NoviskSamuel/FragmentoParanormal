@@ -1,4 +1,4 @@
-module com.mycompany.fragmentoparanormal {
+module fragmentoparanormal {
     requires java.sql;
     requires javafx.controls;
     requires javafx.fxml;

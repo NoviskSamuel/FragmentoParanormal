@@ -1,9 +1,10 @@
 package Dao;
 
+import Model.Personagem;
 import Util.Classe;
 import Util.Elemento;
 import Util.Genero;
-import Model.Personagem;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +36,9 @@ public class PersonagemDAO {
             ps.setInt(13,    p.getVidaAtual());
             ps.setInt(14,    p.getMoedas());
             ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) p.setId(rs.getInt(1));
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) p.setId(rs.getInt(1));
+            }
         }
     }
 
@@ -74,14 +76,34 @@ public class PersonagemDAO {
         return lista;
     }
 
+    public Personagem buscarPorId(int id) throws SQLException {
+        String sql = "SELECT * FROM personagem WHERE id = ?";
+        try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapear(rs);
+            }
+        }
+        return null;
+    }
+
     public Personagem buscarPorNome(String nome) throws SQLException {
         String sql = "SELECT * FROM personagem WHERE nome = ?";
         try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(sql)) {
             ps.setString(1, nome);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return mapear(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapear(rs);
+            }
         }
         return null;
+    }
+
+    public void deletar(int id) throws SQLException {
+        String sql = "DELETE FROM personagem WHERE id = ?";
+        try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        }
     }
 
     private Personagem mapear(ResultSet rs) throws SQLException {

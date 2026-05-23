@@ -7,6 +7,7 @@ public class Batalha {
     private Personagem jogador;
     private Inimigo inimigo;
     private boolean emAndamento;
+    private boolean fugiu;
     private String ultimoLog;
     private static final Random rand = new Random();
 
@@ -14,6 +15,7 @@ public class Batalha {
         this.jogador = jogador;
         this.inimigo = inimigo;
         this.emAndamento = true;
+        this.fugiu = false;
     }
 
     public String executarAcao(AcaoBatalha acao) {
@@ -49,10 +51,11 @@ public class Batalha {
                 }
             }
             case FUGIR -> {
-                boolean fugiu = rand.nextInt(100) < 50;
-                if (fugiu) {
+                boolean tentativaFuga = rand.nextInt(100) < 50;
+                if (tentativaFuga) {
                     emAndamento = false;
-                    this.ultimoLog = log.append("Você fugiu com sucesso!").toString();
+                    this.fugiu = true;
+                    this.ultimoLog = "Você fugiu com sucesso!";
                     return ultimoLog;
                 } else {
                     log.append("Tentativa de fuga falhou!\n");
@@ -69,7 +72,6 @@ public class Batalha {
             return ultimoLog;
         }
 
-        // Contra-ataque do inimigo
         int danoInimigo = Math.max(1, inimigo.getForca() - rand.nextInt(5));
         jogador.receberDano(danoInimigo);
         log.append(inimigo.getNome()).append(" contra-atacou causando ")
@@ -91,7 +93,6 @@ public class Batalha {
         return base + rand.nextInt(6);
     }
 
-    /** Rola chance de drop após vitória */
     public Item rolarDrop(java.util.List<Item> pool) {
         if (pool == null || pool.isEmpty()) return null;
         int chance = 40 + jogador.getInvestigacao();
@@ -104,7 +105,8 @@ public class Batalha {
     public boolean isEmAndamento() { return emAndamento; }
     public boolean jogadorVenceu() { return inimigo.estaMorto(); }
     public boolean jogadorMorreu() { return jogador.estaMorto(); }
-    public String getUltimoLog() { return ultimoLog; }
+    public boolean jogadorFugiu()  { return fugiu; }
+    public String getUltimoLog()   { return ultimoLog; }
     public Personagem getJogador() { return jogador; }
-    public Inimigo getInimigo() { return inimigo; }
+    public Inimigo getInimigo()    { return inimigo; }
 }

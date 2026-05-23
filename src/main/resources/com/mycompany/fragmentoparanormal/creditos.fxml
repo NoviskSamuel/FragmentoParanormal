@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="Controller.CreditosController"
+           styleClass="tela-fundo" prefWidth="960" prefHeight="640">
+    <VBox alignment="CENTER" spacing="20">
+        <Label text="FRAGMENTO"  styleClass="titulo-principal"/>
+        <Label text="PARANORMAL" styleClass="titulo-principal"/>
+        <VBox alignment="CENTER" spacing="8">
+            <Label text="DESENVOLVIDO POR" styleClass="label-credito-titulo"/>
+            <Label fx:id="labelCriadores" text="[Criador 1]&#10;[Criador 2]" styleClass="label-credito" wrapText="true" textAlignment="CENTER"/>
+            <Label text="HISTÓRIA E MÚSICA" styleClass="label-credito-titulo" style="-fx-padding: 10 0 0 0;"/>
+            <Label fx:id="labelArtista" text="[Artista]" styleClass="label-credito"/>
+        </VBox>
+        <Button text="VOLTAR" onAction="#onVoltar" styleClass="btn-menu" style="-fx-padding: 20 0 0 0;"/>
+    </VBox>
+</StackPane>

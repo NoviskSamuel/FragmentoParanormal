@@ -1,5 +1,8 @@
 package Util;
 
 public enum AcaoBatalha {
-    ATACAR, USAR_RITUAL, EQUIPAR_ARMA, FUGIR
+    ATACAR,
+    USAR_RITUAL,
+    EQUIPAR_ARMA,
+    FUGIR
 }

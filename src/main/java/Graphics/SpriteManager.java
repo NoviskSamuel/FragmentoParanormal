@@ -1,166 +1,138 @@
 package Graphics;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.KeyFrame;
-import javafx.animation.ScaleTransition;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
-import java.util.HashMap;
+import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Gerenciador de Sprites do Fragmento Paranormal.
- *
- * Responsabilidades:
- *  - Carregar imagens com cache para não reabrir arquivos
- *  - Aplicar animações de idle, ataque, dano e morte em ImageViews
- *  - Exibir jumpscare do inimigo com fade + shake
- */
 public class SpriteManager {
 
-    // ── Singleton ──────────────────────────────────────────────────────────
     private static SpriteManager instance;
+
     public static SpriteManager getInstance() {
         if (instance == null) instance = new SpriteManager();
         return instance;
     }
+
     private SpriteManager() {}
 
-    // ── Cache de imagens ────────────────────────────────────────────────────
-    private final Map<String, Image> cache = new HashMap<>();
+    private final Map<String, Image> cache = new ConcurrentHashMap<>();
 
-    /**
-     * Carrega imagem com cache.
-     * @param path caminho dentro do classpath, ex: /images/personagens/arthur.png
-     */
     public Image getImagem(String path) {
+        if (path == null || path.isBlank()) return null;
         return cache.computeIfAbsent(path, p -> {
-            var url = getClass().getResource(p);
+            URL url = getClass().getResource(p);
             if (url == null) {
-                // Fallback para placeholder
-                url = getClass().getResource("/images/placeholder.png");
+                url = getClass().getResource("/fragmentoparanormal/images/ui/placeholder.png");
             }
-            return url != null ? new Image(url.toExternalForm()) : null;
+            return url != null ? new Image(url.toExternalForm(), true) : null;
         });
     }
 
-    /**
-     * Define a imagem de um ImageView pelo caminho.
-     */
     public void setSprite(ImageView iv, String path) {
+        if (iv == null) return;
         Image img = getImagem(path);
         if (img != null) iv.setImage(img);
     }
 
-    // ── Animações ─────────────────────────────────────────────────────────
-
-    /**
-     * Animação idle: leve pulso (escala 1.0 → 1.03 → 1.0) em loop.
-     */
-    public Timeline animarIdle(ImageView iv) {
-        ScaleTransition st = new ScaleTransition(Duration.millis(1200), iv);
-        st.setFromX(1.0); st.setToX(1.03);
-        st.setFromY(1.0); st.setToY(1.03);
+    public ScaleTransition animarIdle(ImageView iv) {
+        if (iv == null) return null;
+        ScaleTransition st = new ScaleTransition(Duration.millis(1400), iv);
+        st.setFromX(1.0); st.setToX(1.04);
+        st.setFromY(1.0); st.setToY(1.04);
         st.setAutoReverse(true);
-        st.setCycleCount(Timeline.INDEFINITE);
+        st.setCycleCount(Animation.INDEFINITE);
+        st.setInterpolator(Interpolator.EASE_BOTH);
         st.play();
-        // Retornamos um Timeline "wrapper" para poder parar de fora
-        Timeline tl = new Timeline(new KeyFrame(Duration.millis(1)));
-        tl.setOnFinished(e -> st.stop());
-        return tl;
+        return st;
     }
 
-    /**
-     * Animação de ataque: shake horizontal rápido.
-     */
     public void animarAtaque(ImageView iv, Runnable aoTerminar) {
-        double origX = iv.getTranslateX();
+        if (iv == null) return;
+        double ox = iv.getTranslateX();
         Timeline shake = new Timeline(
-            new KeyFrame(Duration.millis(0),   e -> iv.setTranslateX(origX)),
-            new KeyFrame(Duration.millis(50),  e -> iv.setTranslateX(origX - 12)),
-            new KeyFrame(Duration.millis(100), e -> iv.setTranslateX(origX + 12)),
-            new KeyFrame(Duration.millis(150), e -> iv.setTranslateX(origX - 8)),
-            new KeyFrame(Duration.millis(200), e -> iv.setTranslateX(origX + 8)),
-            new KeyFrame(Duration.millis(250), e -> iv.setTranslateX(origX))
+            new KeyFrame(Duration.ZERO,        e -> iv.setTranslateX(ox)),
+            new KeyFrame(Duration.millis(60),  e -> iv.setTranslateX(ox - 14)),
+            new KeyFrame(Duration.millis(120), e -> iv.setTranslateX(ox + 14)),
+            new KeyFrame(Duration.millis(180), e -> iv.setTranslateX(ox - 9)),
+            new KeyFrame(Duration.millis(240), e -> iv.setTranslateX(ox + 9)),
+            new KeyFrame(Duration.millis(300), e -> iv.setTranslateX(ox))
         );
-        shake.setOnFinished(e -> { if (aoTerminar != null) aoTerminar.run(); });
+        if (aoTerminar != null) shake.setOnFinished(e -> aoTerminar.run());
         shake.play();
     }
 
-    /**
-     * Animação de dano: pisca em vermelho (opacity) e abana.
-     */
     public void animarDano(ImageView iv) {
+        if (iv == null) return;
         Timeline pisca = new Timeline(
-            new KeyFrame(Duration.millis(0),   e -> iv.setOpacity(1.0)),
-            new KeyFrame(Duration.millis(80),  e -> iv.setOpacity(0.2)),
+            new KeyFrame(Duration.ZERO,        e -> iv.setOpacity(1.0)),
+            new KeyFrame(Duration.millis(80),  e -> iv.setOpacity(0.15)),
             new KeyFrame(Duration.millis(160), e -> iv.setOpacity(1.0)),
-            new KeyFrame(Duration.millis(240), e -> iv.setOpacity(0.2)),
+            new KeyFrame(Duration.millis(240), e -> iv.setOpacity(0.15)),
             new KeyFrame(Duration.millis(320), e -> iv.setOpacity(1.0))
         );
         pisca.play();
     }
 
-    /**
-     * Animação de morte: fade out + scale down.
-     */
     public void animarMorte(ImageView iv, Runnable aoTerminar) {
-        FadeTransition ft = new FadeTransition(Duration.millis(600), iv);
-        ft.setFromValue(1.0);
-        ft.setToValue(0.0);
-        ScaleTransition st = new ScaleTransition(Duration.millis(600), iv);
-        st.setToX(0.5);
-        st.setToY(0.5);
-        ft.setOnFinished(e -> { if (aoTerminar != null) aoTerminar.run(); });
-        ft.play();
-        st.play();
+        if (iv == null) return;
+        FadeTransition  ft = new FadeTransition(Duration.millis(700), iv);
+        ScaleTransition st = new ScaleTransition(Duration.millis(700), iv);
+        ft.setFromValue(1.0); ft.setToValue(0.0);
+        st.setToX(0.4);       st.setToY(0.4);
+        ft.setInterpolator(Interpolator.EASE_IN);
+        st.setInterpolator(Interpolator.EASE_IN);
+        if (aoTerminar != null) ft.setOnFinished(e -> aoTerminar.run());
+        new ParallelTransition(iv, ft, st).play();
     }
 
-    /**
-     * JUMPSCARE: exibe imagem do inimigo com fade-in rápido + shake intenso.
-     * Chame quando o jogador entra numa sala com inimigo.
-     *
-     * @param iv          ImageView sobreposto (deve estar visível, opacity 0 inicialmente)
-     * @param imagemPath  caminho do jumpscare
-     * @param aoTerminar  callback após o jumpscare (ex.: mostrar botões de batalha)
-     */
     public void exibirJumpscare(ImageView iv, String imagemPath, Runnable aoTerminar) {
-        setSprite(iv, imagemPath);
-        iv.setOpacity(0);
+        if (iv == null) return;
+        Image img = getImagem(imagemPath);
+        if (img == null) {
+            if (aoTerminar != null) aoTerminar.run();
+            return;
+        }
+        iv.setImage(img);
+        iv.setOpacity(0.0);
         iv.setVisible(true);
+        iv.setScaleX(1.2);
+        iv.setScaleY(1.2);
 
-        // Fase 1: fade in abrupto
-        FadeTransition fadeIn = new FadeTransition(Duration.millis(80), iv);
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(90), iv);
         fadeIn.setFromValue(0.0);
         fadeIn.setToValue(1.0);
 
-        fadeIn.setOnFinished(e -> {
-            // Fase 2: shake intenso
+        fadeIn.setOnFinished(e1 -> {
+            ScaleTransition zoom = new ScaleTransition(Duration.millis(150), iv);
+            zoom.setToX(1.0); zoom.setToY(1.0);
+            zoom.setInterpolator(Interpolator.EASE_OUT);
+
             double ox = iv.getTranslateX();
             Timeline shake = new Timeline(
-                new KeyFrame(Duration.millis(0),   ev -> iv.setTranslateX(ox)),
-                new KeyFrame(Duration.millis(40),  ev -> iv.setTranslateX(ox - 20)),
-                new KeyFrame(Duration.millis(80),  ev -> iv.setTranslateX(ox + 20)),
-                new KeyFrame(Duration.millis(120), ev -> iv.setTranslateX(ox - 15)),
-                new KeyFrame(Duration.millis(160), ev -> iv.setTranslateX(ox + 15)),
-                new KeyFrame(Duration.millis(200), ev -> iv.setTranslateX(ox - 10)),
-                new KeyFrame(Duration.millis(240), ev -> iv.setTranslateX(ox + 10)),
-                new KeyFrame(Duration.millis(280), ev -> iv.setTranslateX(ox))
+                new KeyFrame(Duration.ZERO,        ev -> iv.setTranslateX(ox)),
+                new KeyFrame(Duration.millis(50),  ev -> iv.setTranslateX(ox - 22)),
+                new KeyFrame(Duration.millis(100), ev -> iv.setTranslateX(ox + 22)),
+                new KeyFrame(Duration.millis(150), ev -> iv.setTranslateX(ox - 16)),
+                new KeyFrame(Duration.millis(200), ev -> iv.setTranslateX(ox + 16)),
+                new KeyFrame(Duration.millis(250), ev -> iv.setTranslateX(ox - 10)),
+                new KeyFrame(Duration.millis(300), ev -> iv.setTranslateX(ox + 10)),
+                new KeyFrame(Duration.millis(350), ev -> iv.setTranslateX(ox))
             );
 
-            shake.setOnFinished(ev2 -> {
-                // Fase 3: pequeno pause depois fade out suave
-                Timeline pause = new Timeline(
-                    new KeyFrame(Duration.millis(500))
-                );
-                pause.setOnFinished(ev3 -> {
-                    FadeTransition fadeOut = new FadeTransition(Duration.millis(300), iv);
+            zoom.setOnFinished(e2 -> shake.play());
+
+            shake.setOnFinished(e3 -> {
+                PauseTransition pause = new PauseTransition(Duration.millis(600));
+                pause.setOnFinished(e4 -> {
+                    FadeTransition fadeOut = new FadeTransition(Duration.millis(350), iv);
                     fadeOut.setFromValue(1.0);
                     fadeOut.setToValue(0.0);
-                    fadeOut.setOnFinished(ev4 -> {
+                    fadeOut.setOnFinished(e5 -> {
                         iv.setVisible(false);
                         if (aoTerminar != null) aoTerminar.run();
                     });
@@ -168,13 +140,13 @@ public class SpriteManager {
                 });
                 pause.play();
             });
-            shake.play();
+
+            zoom.play();
         });
 
         fadeIn.play();
     }
 
-    /** Limpa o cache (use ao trocar de fase para liberar memória). */
     public void limparCache() {
         cache.clear();
     }
