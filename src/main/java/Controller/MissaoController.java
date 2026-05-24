@@ -270,14 +270,22 @@ public class MissaoController {
     private Inimigo gerarInimigo() {
         record Cfg(String nome, String img) {}
         List<Cfg> tipos = List.of(
-            new Cfg("Sombra Errante",     "/fragmentoparanormal/images/inimigos/sombra.png"),
-            new Cfg("Espírito Maligno",   "/fragmentoparanormal/images/inimigos/espirito.png"),
-            new Cfg("Criatura das Trevas","/fragmentoparanormal/images/inimigos/criatura.png"),
-            new Cfg("Fantasma Raivoso",   "/fragmentoparanormal/images/inimigos/fantasma.png")
+            new Cfg("Enraizado",  "enraizado.png"), //morte
+            new Cfg("Zumbi de Sangue",   "zumbisangue.png"), //sangue
+            new Cfg("Existido","existido.png"), //conhecimento
+            new Cfg("Anarquico",   "anarquico.png") //energia
         );
         Cfg c   = tipos.get(RAND.nextInt(tipos.size()));
         int sal = Math.max(1, missao.getSalaAtual());
-        Inimigo in = new Inimigo(c.nome(), Elemento.NEUTRO,
+        Elemento[] elementos = {
+    Elemento.CONHECIMENTO,
+    Elemento.ENERGIA,
+    Elemento.MORTE
+        };
+
+Elemento elementoAleatorio = elementos[RAND.nextInt(elementos.length)];
+
+Inimigo in = new Inimigo(c.nome(), elementoAleatorio,
             sal, 6 + sal * 2, 25 + sal * 8, 15 + sal * 5);
         in.setImagemPath(c.img());
         in.setImagemJumpscare(c.img().replace(".png", "_jump.png"));

@@ -15,10 +15,10 @@ public enum Elemento {
 
     public String getImagemPath() {
         return switch (this) {
-            case SANGUE       -> "/fragmentoparanormal/images/elementos/sangue.png";
-            case MORTE        -> "/fragmentoparanormal/images/elementos/morte.png";
-            case CONHECIMENTO -> "/fragmentoparanormal/images/elementos/conhecimento.webp";
-            case ENERGIA      -> "/fragmentoparanormal/images/elementos/energia.webp";
+            case SANGUE       -> "/com/mycompany/fragmentoparanormal/images/elementos/sangue.png";
+            case MORTE        -> "/com/mycompany/fragmentoparanormal/images/elementos/morte.png";
+            case CONHECIMENTO -> "/com/mycompany/fragmentoparanormal/images/elementos/conhecimento.webp";
+            case ENERGIA      -> "/com/mycompany/fragmentoparanormal/images/elementos/energia.webp";
             case NEUTRO       -> null;
         };
     }

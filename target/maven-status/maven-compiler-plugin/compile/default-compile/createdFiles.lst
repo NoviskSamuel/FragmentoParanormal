@@ -14,7 +14,6 @@ Controller\InventarioController.class
 Graphics\SpriteManager.class
 Controller\NovoJogador$1.class
 module-info.class
-fragmentoparanormal\graphics\SpriteManager.class
 Model\Batalha$1.class
 Model\Item.class
 Controller\PrimaryController.class

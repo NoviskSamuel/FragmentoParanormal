@@ -55,17 +55,18 @@ public class Personagem {
     }
 
     public String resolverImagem() {
-        if (classe == null || genero == null) return "/fragmentoparanormal/images/personagens/default.png";
+        if (classe == null || genero == null)
+            return "/com/mycompany/fragmentoparanormal/images/personagens/default.png";
         return switch (classe) {
             case ESPECIALISTA -> genero == Genero.MASCULINO
-                    ? "/fragmentoparanormal/images/personagens/arthur.png"
-                    : "/fragmentoparanormal/images/personagens/erin.png";
+                    ? "/com/mycompany/fragmentoparanormal/images/personagens/arthur.png"
+                    : "/com/mycompany/fragmentoparanormal/images/personagens/erin.png";
             case COMBATENTE   -> genero == Genero.MASCULINO
-                    ? "/fragmentoparanormal/images/personagens/dominic.png"
-                    : "/fragmentoparanormal/images/personagens/carina.png";
+                    ? "/com/mycompany/fragmentoparanormal/images/personagens/dominic.png"
+                    : "/com/mycompany/fragmentoparanormal/images/personagens/carina.png";
             case OCULTISTA    -> genero == Genero.MASCULINO
-                    ? "/fragmentoparanormal/images/personagens/dante.png"
-                    : "/fragmentoparanormal/images/personagens/agatha.png";
+                    ? "/com/mycompany/fragmentoparanormal/images/personagens/dante.png"
+                    : "/com/mycompany/fragmentoparanormal/images/personagens/agatha.png";
         };
     }
 

@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="Controller.JogarController"
            styleClass="tela-fundo" prefWidth="960" prefHeight="640">
+
+    <!-- Ícones decorativos de elementos nos cantos -->
+    <ImageView fitWidth="80" fitHeight="80" opacity="0.35" mouseTransparent="true"
+               StackPane.alignment="TOP_LEFT" translateX="25" translateY="25">
+        <image><Image url="@../images/elementos/morte.png" backgroundLoading="true"/></image>
+    </ImageView>
+    <ImageView fitWidth="80" fitHeight="80" opacity="0.35" mouseTransparent="true"
+               StackPane.alignment="TOP_RIGHT" translateX="-25" translateY="25">
+        <image><Image url="@../images/elementos/energia.webp" backgroundLoading="true"/></image>
+    </ImageView>
+    <ImageView fitWidth="80" fitHeight="80" opacity="0.3" mouseTransparent="true"
+               StackPane.alignment="BOTTOM_LEFT" translateX="25" translateY="-25">
+        <image><Image url="@../images/elementos/sangue.png" backgroundLoading="true"/></image>
+    </ImageView>
+    <ImageView fitWidth="80" fitHeight="80" opacity="0.3" mouseTransparent="true"
+               StackPane.alignment="BOTTOM_RIGHT" translateX="-25" translateY="-25">
+        <image><Image url="@../images/elementos/conhecimento.webp" backgroundLoading="true"/></image>
+    </ImageView>
+
     <VBox alignment="CENTER" spacing="30">
         <Label text="FRAGMENTO PARANORMAL" styleClass="titulo-principal"/>
         <HBox alignment="CENTER" spacing="60">
@@ -14,4 +34,7 @@
         <Label    fx:id="labelErro"        styleClass="label-erro"/>
         <Button text="SAIR" onAction="#onSair" styleClass="btn-menu"/>
     </VBox>
+
+    <Label text="✦" style="-fx-text-fill: #441100; -fx-font-size: 28px;"
+           StackPane.alignment="BOTTOM_RIGHT" translateX="-16" translateY="-14"/>
 </StackPane>

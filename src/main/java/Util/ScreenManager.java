@@ -49,7 +49,7 @@ public class ScreenManager {
         Parent root = carregar(TELA_INICIAL);
         this.scene = new Scene(root, 960, 640);
 
-        URL css = getClass().getResource("/fragmentoparanormal/css/estilo.css");
+        URL css = getClass().getResource("/com/mycompany/fragmentoparanormal/css/estilo.css");
         if (css != null) scene.getStylesheets().add(css.toExternalForm());
 
         stage.setScene(scene);
@@ -105,7 +105,7 @@ public class ScreenManager {
     }
 
     private Parent carregar(String fxml) throws IOException {
-        String path = "/fragmentoparanormal/fxml/" + fxml + ".fxml";
+        String path = "/com/mycompany/fragmentoparanormal/" + fxml + ".fxml";
         URL url = getClass().getResource(path);
         if (url == null) {
             throw new IOException("FXML não encontrado: " + path);

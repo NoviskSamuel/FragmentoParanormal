@@ -84,7 +84,7 @@ public class NovoJogador {
         Genero g = generoEscolhido();
         if (c == null || g == null) return;
 
-        Personagem temp = new Personagem("preview", c, g, Elemento.NEUTRO);
+        Personagem temp = new Personagem("preview", c, g, elementoEscolhido());
         SpriteManager.getInstance().setSprite(imgPreview, temp.resolverImagem());
         labelDescClasse.setText(c.getDescricao());
 
@@ -114,6 +114,6 @@ public class NovoJogador {
         for (Elemento e : Elemento.values()) {
             if (e.getNome().equals(nome)) return e;
         }
-        return Elemento.NEUTRO;
+        return Elemento.valueOf(nome.toUpperCase());
     }
 }
