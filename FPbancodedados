@@ -1,0 +1,123 @@
+CREATE TABLE IF NOT EXISTS personagem (
+    id                 SERIAL PRIMARY KEY,
+    nome               VARCHAR(100)  NOT NULL,
+    nivel              INTEGER       NOT NULL DEFAULT 1,
+    classe             VARCHAR(20)   NOT NULL CHECK (classe IN ('ESPECIALISTA', 'COMBATENTE', 'OCULTISTA')),
+    genero             VARCHAR(20)   NOT NULL CHECK (genero IN ('MASCULINO', 'FEMININO')),
+    elemento           VARCHAR(20)   NOT NULL CHECK (elemento IN ('SANGUE', 'MORTE', 'CONHECIMENTO', 'ENERGIA')),
+    imagem_path        VARCHAR(255),
+    xp_atual           INTEGER       NOT NULL DEFAULT 0,
+    xp_proximo_nivel   INTEGER       NOT NULL DEFAULT 100,
+    forca              INTEGER       NOT NULL DEFAULT 10,
+    poder_paranormal   INTEGER       NOT NULL DEFAULT 10,
+    investigacao       INTEGER       NOT NULL DEFAULT 10,
+    vida_maxima        INTEGER       NOT NULL DEFAULT 100,
+    vida_atual         INTEGER       NOT NULL DEFAULT 100,
+    moedas             INTEGER       NOT NULL DEFAULT 0,
+    -- ===== Sistema de Stamina (anti-spam / anti-farm) =====
+    stamina_maxima     INTEGER       NOT NULL DEFAULT 100,
+    stamina_atual      INTEGER       NOT NULL DEFAULT 100,
+    stamina_atualizada_em TIMESTAMP  NOT NULL DEFAULT NOW()
+);
+
+-- Caso a tabela já exista de uma execução anterior sem as colunas novas:
+ALTER TABLE personagem ADD COLUMN IF NOT EXISTS stamina_maxima INTEGER NOT NULL DEFAULT 100;
+ALTER TABLE personagem ADD COLUMN IF NOT EXISTS stamina_atual  INTEGER NOT NULL DEFAULT 100;
+ALTER TABLE personagem ADD COLUMN IF NOT EXISTS stamina_atualizada_em TIMESTAMP NOT NULL DEFAULT NOW();
+
+
+CREATE TABLE IF NOT EXISTS missao (
+    id              SERIAL PRIMARY KEY,
+    titulo          VARCHAR(150)  NOT NULL,
+    descricao       TEXT,
+    objetivo        VARCHAR(255),
+    total_objetivo  INTEGER       NOT NULL DEFAULT 1,
+    nivel_minimo    INTEGER       NOT NULL DEFAULT 1,
+    total_salas     INTEGER       NOT NULL DEFAULT 1
+);
+
+
+CREATE TABLE IF NOT EXISTS progresso_missao (
+    personagem_id    INTEGER NOT NULL REFERENCES personagem(id) ON DELETE CASCADE,
+    missao_id        INTEGER NOT NULL REFERENCES missao(id)     ON DELETE CASCADE,
+    progresso_atual  INTEGER NOT NULL DEFAULT 0,
+    sala_atual       INTEGER NOT NULL DEFAULT 1,
+    concluida        BOOLEAN NOT NULL DEFAULT FALSE,
+    vezes_retornou   INTEGER NOT NULL DEFAULT 0,
+    fugiu            BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (personagem_id, missao_id)
+);
+
+CREATE TABLE IF NOT EXISTS item (
+    id           SERIAL PRIMARY KEY,
+    nome         VARCHAR(100) NOT NULL,
+    tipo         VARCHAR(50)  NOT NULL,   -- ex: ARMA, ARMADURA, CONSUMIVEL, RELÍQUIA
+    valor        INTEGER      NOT NULL DEFAULT 0,
+    descricao    TEXT,
+    imagem_path  VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS inventario (
+    personagem_id  INTEGER NOT NULL REFERENCES personagem(id) ON DELETE CASCADE,
+    item_id        INTEGER NOT NULL REFERENCES item(id)       ON DELETE CASCADE,
+    equipado       BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (personagem_id, item_id)
+);
+
+CREATE TABLE IF NOT EXISTS upgrade (
+    id             SERIAL PRIMARY KEY,
+    personagem_id  INTEGER      NOT NULL REFERENCES personagem(id) ON DELETE CASCADE,
+    atributo       VARCHAR(50)  NOT NULL,   -- ex: forca, poder_paranormal, investigacao
+    pontos_gastos  INTEGER      NOT NULL DEFAULT 1,
+    realizado_em   TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS historico_partida (
+    id             SERIAL PRIMARY KEY,
+    personagem_id  INTEGER      NOT NULL REFERENCES personagem(id) ON DELETE CASCADE,
+    missao_id      INTEGER      NOT NULL REFERENCES missao(id)     ON DELETE CASCADE,
+    resultado      VARCHAR(20)  NOT NULL CHECK (resultado IN ('VITORIA', 'DERROTA', 'FUGA')),
+    inimigos_mortos INTEGER     NOT NULL DEFAULT 0,
+    moedas_ganhas   INTEGER     NOT NULL DEFAULT 0,
+    jogado_em       TIMESTAMP   NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO missao (titulo, descricao, objetivo, total_objetivo, nivel_minimo, total_salas)
+SELECT * FROM (VALUES
+    ('A Casa Abandonada',
+     'Uma antiga mansão esconde segredos sombrios. Investigue e elimine os espíritos que a assombram.',
+     'Eliminar espíritos', 3, 1, 3),
+
+    ('O Ritual Esquecido',
+     'Cultistas realizaram um ritual proibido na floresta. Interrompa-o antes que seja tarde demais.',
+     'Destruir altares', 4, 3, 4),
+
+    ('Fragmentos da Escuridão',
+     'Fragmentos paranormais estão corrompendo a cidade. Colete-os antes que se espalhem.',
+     'Coletar fragmentos', 5, 5, 5),
+
+    ('O Portal Sombrio',
+     'Um portal foi aberto entre os mundos. Feche-o e enfrente o que vier do outro lado.',
+     'Fechar portais', 2, 8, 6),
+
+    ('A Última Chave',
+     'O chefe das trevas aguarda. Reúna as chaves e enfrente-o em sua dimensão.',
+     'Derrotar o chefe', 1, 10, 8)
+) AS v(titulo, descricao, objetivo, total_objetivo, nivel_minimo, total_salas)
+WHERE NOT EXISTS (SELECT 1 FROM missao WHERE missao.titulo = v.titulo);
+
+INSERT INTO item (nome, tipo, valor, descricao, imagem_path)
+SELECT * FROM (VALUES
+    ('Faca Ritual',      'ARMA',       50,  '+5 Força. Lâmina abençoada com ritos antigos.',          NULL),
+    ('Amuleto Sombrio',  'RELÍQUIA',   80,  '+5 Poder Paranormal. Emana energia sobrenatural.',        NULL),
+    ('Lupa do Detetive', 'RELÍQUIA',   60,  '+5 Investigação. Revela pistas ocultas.',                 NULL),
+    ('Poção de Cura',    'CONSUMIVEL', 30,  'Restaura 30 pontos de vida.',                             NULL),
+    ('Escudo de Ossos',  'ARMADURA',   120, '+20 Vida Máxima. Forjado com ossos de criaturas antigas.',NULL),
+    ('Cristal de Energia','CONSUMIVEL',40,  'Restaura 20 pontos de vida e concede +2 Poder por turno.',NULL)
+) AS v(nome, tipo, valor, descricao, imagem_path)
+WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.nome = v.nome);
+
+CREATE INDEX IF NOT EXISTS idx_personagem_nivel   ON personagem(nivel DESC);
+CREATE INDEX IF NOT EXISTS idx_progresso_personagem ON progresso_missao(personagem_id);
+CREATE INDEX IF NOT EXISTS idx_historico_personagem ON historico_partida(personagem_id);
+CREATE INDEX IF NOT EXISTS idx_upgrade_personagem   ON upgrade(personagem_id);

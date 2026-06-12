@@ -23,6 +23,20 @@ public class Personagem {
     private int vidaAtual;
     private int moedas;
 
+    // ===== Sistema de Stamina (anti-spam / anti-farm) =====
+    public static final int STAMINA_MAXIMA_PADRAO = 100;
+    public static final int CUSTO_STAMINA_INVESTIGAR = 10;
+    public static final int CUSTO_STAMINA_AVANCAR    = 5;
+    public static final int CUSTO_STAMINA_ATACAR     = 8;
+    public static final int CUSTO_STAMINA_RITUAL     = 12;
+    public static final int CUSTO_STAMINA_FUGIR      = 5;
+    // tempo (em segundos) para regenerar 1 ponto de stamina fora de combate
+    public static final int SEGUNDOS_POR_PONTO_REGEN = 30;
+
+    private int staminaMaxima = STAMINA_MAXIMA_PADRAO;
+    private int staminaAtual  = STAMINA_MAXIMA_PADRAO;
+    private java.time.LocalDateTime staminaAtualizadaEm = java.time.LocalDateTime.now();
+
     private Inventario inventario = new Inventario();
 
     public Personagem() {}
@@ -110,6 +124,61 @@ public class Personagem {
         this.vidaAtual = this.vidaMaxima;
     }
 
+    // ===================== STAMINA =====================
+
+    /**
+     * Regenera stamina com base no tempo real passado desde a última
+     * atualização (SEGUNDOS_POR_PONTO_REGEN segundos por ponto).
+     * Deve ser chamado antes de checar/consumir stamina.
+     */
+    public void regenerarStamina() {
+        if (staminaAtual >= staminaMaxima) {
+            staminaAtualizadaEm = java.time.LocalDateTime.now();
+            return;
+        }
+        long segundos = java.time.Duration.between(staminaAtualizadaEm, java.time.LocalDateTime.now()).getSeconds();
+        if (segundos <= 0) return;
+
+        int pontosRegenerados = (int) (segundos / SEGUNDOS_POR_PONTO_REGEN);
+        if (pontosRegenerados > 0) {
+            this.staminaAtual = Math.min(staminaMaxima, staminaAtual + pontosRegenerados);
+            // mantém o "resto" de segundos não convertidos para não perder progresso de regen
+            long restoSegundos = segundos % SEGUNDOS_POR_PONTO_REGEN;
+            this.staminaAtualizadaEm = java.time.LocalDateTime.now().minusSeconds(restoSegundos);
+        }
+    }
+
+    /** Verifica se há stamina suficiente para realizar uma ação. */
+    public boolean temStaminaPara(int custo) {
+        regenerarStamina();
+        return staminaAtual >= custo;
+    }
+
+    /**
+     * Consome stamina para realizar uma ação.
+     * Retorna true se a ação foi permitida (stamina suficiente), false caso contrário.
+     * Não consome stamina se for insuficiente.
+     */
+    public boolean consumirStamina(int custo) {
+        regenerarStamina();
+        if (staminaAtual < custo) return false;
+        staminaAtual -= custo;
+        staminaAtualizadaEm = java.time.LocalDateTime.now();
+        return true;
+    }
+
+    public void restaurarStaminaTotal() {
+        this.staminaAtual = this.staminaMaxima;
+        this.staminaAtualizadaEm = java.time.LocalDateTime.now();
+    }
+
+    public void recuperarStamina(int quantidade) {
+        if (quantidade <= 0) return;
+        this.staminaAtual = Math.min(staminaMaxima, this.staminaAtual + quantidade);
+        this.staminaAtualizadaEm = java.time.LocalDateTime.now();
+    }
+
+
     public int    getId()                         { return id; }
     public void   setId(int id)                   { this.id = id; }
     public String getNome()                       { return nome; }
@@ -142,4 +211,11 @@ public class Personagem {
     public void setMoedas(int moedas)             { this.moedas = Math.max(0, moedas); }
     public Inventario getInventario()             { return inventario; }
     public void       setInventario(Inventario i) { this.inventario = i; }
+
+    public int  getStaminaMaxima()                       { return staminaMaxima; }
+    public void setStaminaMaxima(int staminaMaxima)      { this.staminaMaxima = Math.max(1, staminaMaxima); }
+    public int  getStaminaAtual()                        { return staminaAtual; }
+    public void setStaminaAtual(int staminaAtual)        { this.staminaAtual = Math.max(0, Math.min(staminaAtual, staminaMaxima)); }
+    public java.time.LocalDateTime getStaminaAtualizadaEm()        { return staminaAtualizadaEm; }
+    public void setStaminaAtualizadaEm(java.time.LocalDateTime dt) { this.staminaAtualizadaEm = dt != null ? dt : java.time.LocalDateTime.now(); }
 }

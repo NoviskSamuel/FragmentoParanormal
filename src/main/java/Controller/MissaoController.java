@@ -33,6 +33,7 @@ public class MissaoController {
     @FXML private Label     labelVidaInimigo;
     @FXML private Label     labelNarrative;
     @FXML private Label     labelFragmento;
+    @FXML private Label     labelStamina;
 
     @FXML private ImageView imgPersonagem;
     @FXML private ImageView imgInimigo;
@@ -73,12 +74,34 @@ public class MissaoController {
     }
 
     private void atualizarHUD() {
+        jogador.regenerarStamina();
         labelTitulo.setText(missao.getTitulo());
         labelObjetivo.setText("Objetivo: " + missao.getObjetivo() + " — " + missao.getProgressoTexto());
         labelSala.setText("Sala " + missao.getSalaAtual() + " / " + missao.getTotalSalas());
         labelVida.setText("❤ " + jogador.getVidaAtual() + " / " + jogador.getVidaMaxima());
         labelFragmento.setText("📜 Fragmentos: " + missao.getProgressoTexto());
+        labelStamina.setText("⚡ " + jogador.getStaminaAtual() + " / " + jogador.getStaminaMaxima());
     }
+
+    /**
+     * Verifica se há stamina suficiente para a ação. Se não houver,
+     * exibe aviso na narrativa e impede a ação (anti-spam / anti-farm).
+     */
+    private boolean exigirStamina(int custo) {
+    jogador.regenerarStamina();
+    if (!jogador.temStaminaPara(custo)) {
+        labelNarrative.setText("⚡ Stamina insuficiente! Entrando em modo de descanso...");
+        atualizarHUD();
+        javafx.animation.PauseTransition pausa =
+            new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1.2));
+        pausa.setOnFinished(e -> onDescansar());
+        pausa.play();
+        return false;
+    }
+    jogador.consumirStamina(custo);
+    atualizarHUD();
+    return true;
+}
 
     @FXML
     private void onAvancar() {
@@ -86,6 +109,7 @@ public class MissaoController {
             labelNarrative.setText("Você chegou ao fim da área. Nenhum fragmento restante foi encontrado.");
             return;
         }
+        if (!exigirStamina(Personagem.CUSTO_STAMINA_AVANCAR)) return;
         missao.avancarSala();
         atualizarHUD();
         gerarEvento();
@@ -93,6 +117,7 @@ public class MissaoController {
 
     @FXML
     private void onInvestigar() {
+        if (!exigirStamina(Personagem.CUSTO_STAMINA_INVESTIGAR)) return;
         int chance = Math.min(90, 20 + jogador.getInvestigacao() * 2);
         if (RAND.nextInt(100) < chance) {
             Item item = gerarItem();
@@ -123,6 +148,7 @@ public class MissaoController {
         missao.setFugiu(true);
         missao.setVezesRetornou(missao.getVezesRetornou() + 1);
         salvarProgresso();
+        salvarPersonagem();
         try {
             new RankingDAO().registrarPartida(
                 jogador.getId(), missao.getId(), "FUGA", inimigosMortos, moedasSessao);
@@ -146,6 +172,13 @@ public class MissaoController {
 
     private void executarBatalha(AcaoBatalha acao) {
         if (batalhaAtual == null || !batalhaAtual.isEmAndamento()) return;
+
+        int custoStamina = switch (acao) {
+            case ATACAR, EQUIPAR_ARMA -> Personagem.CUSTO_STAMINA_ATACAR;
+            case USAR_RITUAL          -> Personagem.CUSTO_STAMINA_RITUAL;
+            case FUGIR                -> Personagem.CUSTO_STAMINA_FUGIR;
+        };
+        if (!exigirStamina(custoStamina)) return;
 
         SpriteManager.getInstance().animarAtaque(imgPersonagem, null);
 
@@ -208,7 +241,10 @@ public class MissaoController {
                 missao.setSalaAtual(0);
                 missao.setFugiu(false);
                 missao.setVezesRetornou(0);
+                jogador.restaurarVidaTotal();
+                jogador.restaurarStaminaTotal();
                 salvarProgresso();
+                salvarPersonagem();
                 try {
                     new RankingDAO().registrarPartida(
                         jogador.getId(), missao.getId(), "MORTE", inimigosMortos, moedasSessao);
@@ -339,4 +375,12 @@ Inimigo in = new Inimigo(c.nome(), elementoAleatorio,
             System.err.println("Erro ao salvar personagem: " + e.getMessage());
         }
     }
+    
+    @FXML
+    private void onDescansar() {
+        salvarPersonagem();
+        ScreenManager.getInstance().ir(ScreenManager.TELA_DESCANSO);
+    }
+
+  
 }

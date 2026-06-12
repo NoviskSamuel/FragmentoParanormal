@@ -4,8 +4,7 @@ public enum Elemento {
     SANGUE("Sangue"),
     MORTE("Morte"),
     CONHECIMENTO("Conhecimento"),
-    ENERGIA("Energia"),
-    NEUTRO("Neutro");
+    ENERGIA("Energia");
 
     private final String nome;
 
@@ -19,7 +18,6 @@ public enum Elemento {
             case MORTE        -> "/com/mycompany/fragmentoparanormal/images/elementos/morte.png";
             case CONHECIMENTO -> "/com/mycompany/fragmentoparanormal/images/elementos/conhecimento.webp";
             case ENERGIA      -> "/com/mycompany/fragmentoparanormal/images/elementos/energia.webp";
-            case NEUTRO       -> null;
         };
     }
 
@@ -29,7 +27,6 @@ public enum Elemento {
             case MORTE        -> "Ceifa e decadência. Aumenta dano e enfraquece inimigos.";
             case CONHECIMENTO -> "Saber proibido. Eleva investigação e poder dos rituais.";
             case ENERGIA      -> "Força bruta paranormal. Maximiza ataques e reflexos.";
-            case NEUTRO       -> "Sem afinidade elemental.";
         };
     }
 }

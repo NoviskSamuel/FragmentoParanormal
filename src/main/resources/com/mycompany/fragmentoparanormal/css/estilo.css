@@ -1,306 +1,120 @@
-.root {
-    -fx-font-family: "Segoe UI", sans-serif;
+/* ================================================================
+   ADIÇÕES AO estilo.css — Turno de Descanso
+   Cole no final do arquivo estilo.css existente
+   ================================================================ */
+
+/* ── Cabeçalho da tela de descanso ──────────────────────────────── */
+.painel-descanso-header {
+    -fx-background-color: #0d0000;
+    -fx-border-color: #550000;
+    -fx-border-width: 0 0 1 0;
 }
 
-.tela-fundo {
-    -fx-background-color: #000000;
-}
-
-.titulo-principal {
-    -fx-font-size: 48px;
+.titulo-descanso {
+    -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: #cc2200;
-    -fx-effect: dropshadow(gaussian, #660000, 16, 0.6, 0, 0);
+    -fx-text-fill: #2299cc;
+    -fx-effect: dropshadow(gaussian, #004488, 10, 0.5, 0, 0);
     -fx-font-family: "Georgia", serif;
 }
 
-.titulo-painel {
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #cc3300;
-    -fx-padding: 6 0 6 0;
-}
-
-.btn-menu {
-    -fx-background-color: transparent;
-    -fx-text-fill: #cc3300;
-    -fx-font-size: 22px;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, #660000, 6, 0.3, 0, 0);
-}
-
-.btn-menu:hover {
-    -fx-text-fill: #ff5500;
-    -fx-effect: dropshadow(gaussian, #ff3300, 12, 0.6, 0, 0);
-}
-
-.btn-grande {
-    -fx-background-color: #1a0000;
-    -fx-border-color: #660000;
-    -fx-border-width: 2;
-    -fx-text-fill: #cc3300;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-padding: 12 20 12 20;
-    -fx-cursor: hand;
-}
-
-.btn-grande:hover {
-    -fx-background-color: #330000;
-    -fx-text-fill: #ff5500;
-}
-
-.btn-acao {
-    -fx-background-color: #2a0000;
-    -fx-border-color: #880000;
+/* ── Painel central do minigame ──────────────────────────────────── */
+.painel-descanso {
+    -fx-background-color: #0a0d1a;
+    -fx-border-color: #1a3366;
     -fx-border-width: 1;
-    -fx-text-fill: #cc3300;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 24 32 24 32;
+    -fx-effect: dropshadow(gaussian, #001133, 20, 0.4, 0, 0);
+}
+
+.titulo-descanso-sub {
     -fx-font-size: 14px;
-    -fx-padding: 8 16 8 16;
-    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3388bb;
+    -fx-letter-spacing: 2;
 }
 
-.btn-acao:hover {
-    -fx-background-color: #440000;
-    -fx-text-fill: #ff4400;
+/* ── Label de instrução (muda durante a animação) ───────────────── */
+.label-descanso-instrucao {
+    -fx-text-fill: #66aadd;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
 }
 
-.btn-fuga {
-    -fx-background-color: #1a0000;
-    -fx-border-color: #550000;
-    -fx-text-fill: #993300;
-    -fx-font-size: 13px;
-    -fx-padding: 8 14 8 14;
-    -fx-cursor: hand;
-}
-
-.btn-confirmar {
-    -fx-background-color: #3a0a0a;
-    -fx-border-color: #aa2200;
-    -fx-border-width: 2;
-    -fx-text-fill: #ff6633;
+/* ── Label de feedback (✔ / ❌) ──────────────────────────────────── */
+.label-descanso-feedback {
+    -fx-text-fill: #88ccff;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-padding: 10 22 10 22;
-    -fx-cursor: hand;
 }
 
-.btn-sair {
-    -fx-background-color: transparent;
-    -fx-border-color: #550000;
-    -fx-text-fill: #880000;
-    -fx-font-size: 14px;
-    -fx-padding: 10 20 10 20;
-    -fx-cursor: hand;
-}
-
-.btn-aceitar {
-    -fx-background-color: #2a0a00;
-    -fx-border-color: #883300;
-    -fx-border-width: 2;
-    -fx-text-fill: #cc5500;
-    -fx-font-size: 16px;
-    -fx-padding: 10 24 10 24;
-    -fx-cursor: hand;
-}
-
-.btn-recusar {
-    -fx-background-color: #1a0000;
-    -fx-border-color: #550000;
-    -fx-text-fill: #772200;
-    -fx-font-size: 16px;
-    -fx-padding: 10 24 10 24;
-    -fx-cursor: hand;
-}
-
-.btn-up {
-    -fx-background-color: #2a0000;
-    -fx-border-color: #770000;
-    -fx-text-fill: #cc3300;
-    -fx-font-size: 14px;
-    -fx-padding: 4 12 4 12;
-    -fx-cursor: hand;
-}
-
-.painel-formulario {
-    -fx-background-color: #2a0404;
-    -fx-border-color: #660000;
-    -fx-border-width: 2;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-padding: 18 28 18 28;
-    -fx-max-width: 620;
-}
-
-.label-campo {
-    -fx-text-fill: #cc4422;
-    -fx-font-size: 14px;
-    -fx-min-width: 100;
-}
-
-.label-desc {
-    -fx-text-fill: #994422;
+/* ── Legenda dos símbolos ────────────────────────────────────────── */
+.label-descanso-legenda {
+    -fx-text-fill: #446688;
     -fx-font-size: 12px;
 }
 
-.label-narrativa {
-    -fx-text-fill: #cc5533;
-    -fx-font-size: 16px;
-    -fx-text-alignment: CENTER;
+/* ── Botão base de símbolo (estado normal / desabilitado) ─────────── */
+.btn-descanso-simbolo {
+    -fx-background-color: #111830;
+    -fx-border-color: #223355;
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-text-fill: #4477aa;
+    -fx-font-size: 32px;
+    -fx-min-width:  72px;
+    -fx-min-height: 72px;
+    -fx-cursor: hand;
 }
 
-.label-vida {
-    -fx-text-fill: #cc2200;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
+.btn-descanso-simbolo:hover {
+    -fx-background-color: #1a2a44;
+    -fx-border-color: #4488cc;
+    -fx-text-fill: #88ccff;
+    -fx-effect: dropshadow(gaussian, #224488, 14, 0.5, 0, 0);
 }
 
-.label-vida-inimigo {
-    -fx-text-fill: #aa2200;
-    -fx-font-size: 14px;
+.btn-descanso-simbolo:disabled {
+    -fx-opacity: 0.45;
+    -fx-cursor: default;
 }
 
-.label-objetivo {
-    -fx-text-fill: #cc5533;
-    -fx-font-size: 13px;
-}
-
-.label-sala {
-    -fx-text-fill: #884422;
-    -fx-font-size: 12px;
-}
-
-.label-fragmento {
-    -fx-text-fill: #cc7744;
-    -fx-font-size: 13px;
-}
-
-.label-item {
+/* ── Destaques de flash por elemento (aplicados via Java) ─────────── */
+.btn-descanso-fogo {
+    -fx-background-color: #3a0a00;
+    -fx-border-color: #ff4400;
     -fx-text-fill: #ff8855;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #ff3300, 18, 0.7, 0, 0);
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
 }
 
-.label-erro {
-    -fx-text-fill: #ff4444;
-    -fx-font-size: 13px;
+.btn-descanso-terra {
+    -fx-background-color: #1a2000;
+    -fx-border-color: #88aa00;
+    -fx-text-fill: #ccee44;
+    -fx-effect: dropshadow(gaussian, #446600, 18, 0.7, 0, 0);
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
 }
 
-.label-classe {
-    -fx-text-fill: #995533;
-    -fx-font-size: 13px;
+.btn-descanso-agua {
+    -fx-background-color: #001a2a;
+    -fx-border-color: #0099cc;
+    -fx-text-fill: #44ccff;
+    -fx-effect: dropshadow(gaussian, #0055aa, 18, 0.7, 0, 0);
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
 }
 
-.label-nivel {
-    -fx-text-fill: #cc7744;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-}
-
-.label-nome-personagem {
-    -fx-text-fill: #cc8855;
-    -fx-font-size: 14px;
-    -fx-font-style: italic;
-}
-
-.label-credito-titulo {
-    -fx-text-fill: #cc5533;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-}
-
-.label-credito {
-    -fx-text-fill: #995533;
-    -fx-font-size: 14px;
-}
-
-.label-titulo-missao {
-    -fx-text-fill: #ff6633;
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-}
-
-.label-atributo {
-    -fx-text-fill: #cc7744;
-    -fx-font-size: 14px;
-    -fx-min-width: 40;
-}
-
-.label-pontos {
-    -fx-text-fill: #ff9944;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-}
-
-.campo-texto {
-    -fx-background-color: #660000;
-    -fx-text-fill: #ffccbb;
-    -fx-border-color: #aa2200;
-    -fx-border-width: 1;
-}
-
-.combo-personagem, .combo-elemento {
-    -fx-background-color: #330000;
-    -fx-border-color: #660000;
-}
-
-.combo-personagem .list-cell, .combo-elemento .list-cell {
-    -fx-background-color: #1a0000;
-    -fx-text-fill: #cc4422;
-}
-
-.radio-classe {
-    -fx-text-fill: #cc4422;
-}
-
-.lista-missoes, .lista-itens {
-    -fx-background-color: #1a0000;
-    -fx-border-color: #550000;
-}
-
-.lista-missoes .list-cell, .lista-itens .list-cell {
-    -fx-background-color: #200000;
-    -fx-text-fill: #cc4422;
-}
-
-.lista-missoes .list-cell:selected, .lista-itens .list-cell:selected {
-    -fx-background-color: #550000;
-    -fx-text-fill: #ff8855;
-}
-
-.painel-item {
-    -fx-background-color: #250000;
-    -fx-border-color: #770000;
-    -fx-border-width: 1;
-    -fx-padding: 10;
-}
-
-.tabela-ranking {
-    -fx-background-color: #1a0000;
-    -fx-border-color: #550000;
-}
-
-.tabela-ranking .table-row-cell {
-    -fx-background-color: #1a0000;
-    -fx-text-fill: #cc4422;
-}
-
-.tabela-ranking .table-row-cell:selected {
-    -fx-background-color: #440000;
-}
-
-.tabela-ranking .column-header {
-    -fx-background-color: #2a0000;
-}
-
-.tabela-ranking .column-header .label {
-    -fx-text-fill: #cc3300;
-    -fx-font-weight: bold;
-}
-
-.titulo-missao {
-    -fx-text-fill: #cc3300;
-    -fx-font-size: 20px;
-    -fx-font-weight: bold;
+.btn-descanso-ar {
+    -fx-background-color: #1a1a2a;
+    -fx-border-color: #aa88ff;
+    -fx-text-fill: #ddbbff;
+    -fx-effect: dropshadow(gaussian, #6644cc, 18, 0.7, 0, 0);
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
 }

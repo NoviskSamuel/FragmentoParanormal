@@ -16,8 +16,9 @@ public class PersonagemDAO {
             INSERT INTO personagem
             (nome, nivel, classe, genero, elemento, imagem_path,
              xp_atual, xp_proximo_nivel, forca, poder_paranormal,
-             investigacao, vida_maxima, vida_atual, moedas)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+             investigacao, vida_maxima, vida_atual, moedas,
+             stamina_maxima, stamina_atual, stamina_atualizada_em)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """;
         try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(
                 sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -35,6 +36,9 @@ public class PersonagemDAO {
             ps.setInt(12,    p.getVidaMaxima());
             ps.setInt(13,    p.getVidaAtual());
             ps.setInt(14,    p.getMoedas());
+            ps.setInt(15,    p.getStaminaMaxima());
+            ps.setInt(16,    p.getStaminaAtual());
+            ps.setTimestamp(17, Timestamp.valueOf(p.getStaminaAtualizadaEm()));
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) p.setId(rs.getInt(1));
@@ -47,7 +51,8 @@ public class PersonagemDAO {
             UPDATE personagem SET
               nivel=?, xp_atual=?, xp_proximo_nivel=?, forca=?,
               poder_paranormal=?, investigacao=?, vida_maxima=?,
-              vida_atual=?, moedas=?, imagem_path=?
+              vida_atual=?, moedas=?, imagem_path=?,
+              stamina_maxima=?, stamina_atual=?, stamina_atualizada_em=?
             WHERE id=?
             """;
         try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(sql)) {
@@ -61,7 +66,10 @@ public class PersonagemDAO {
             ps.setInt(8,    p.getVidaAtual());
             ps.setInt(9,    p.getMoedas());
             ps.setString(10, p.getImagemPath());
-            ps.setInt(11,   p.getId());
+            ps.setInt(11,   p.getStaminaMaxima());
+            ps.setInt(12,   p.getStaminaAtual());
+            ps.setTimestamp(13, Timestamp.valueOf(p.getStaminaAtualizadaEm()));
+            ps.setInt(14,   p.getId());
             ps.executeUpdate();
         }
     }
@@ -123,6 +131,11 @@ public class PersonagemDAO {
         p.setVidaMaxima(rs.getInt("vida_maxima"));
         p.setVidaAtual(rs.getInt("vida_atual"));
         p.setMoedas(rs.getInt("moedas"));
+        p.setStaminaMaxima(rs.getInt("stamina_maxima"));
+        p.setStaminaAtual(rs.getInt("stamina_atual"));
+        Timestamp ts = rs.getTimestamp("stamina_atualizada_em");
+        p.setStaminaAtualizadaEm(ts != null ? ts.toLocalDateTime() : java.time.LocalDateTime.now());
+        p.regenerarStamina();
         return p;
     }
 }

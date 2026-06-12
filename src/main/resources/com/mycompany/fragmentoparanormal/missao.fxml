@@ -12,6 +12,7 @@
         <Label fx:id="labelSala"      styleClass="label-sala"/>
         <HBox alignment="CENTER" spacing="30">
             <Label fx:id="labelVida"       styleClass="label-vida"/>
+            <Label fx:id="labelStamina"    styleClass="label-vida"/>
             <Label fx:id="labelVidaInimigo" styleClass="label-vida-inimigo" visible="false"/>
         </HBox>
         <HBox alignment="CENTER" spacing="40" VBox.vgrow="ALWAYS">
