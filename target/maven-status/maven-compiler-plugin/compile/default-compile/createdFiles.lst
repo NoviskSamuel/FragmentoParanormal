@@ -8,6 +8,14 @@ Dao/PersonagemDAO.class
 Model/Ranking.class
 Controller/MissaoController.class
 Controller/DescansoController.class
+Controller/MissaoController$1Cfg.class
+Controller/Confirmacao.class
+Controller/LevelUpController.class
+Default/App.class
+Model/Batalha$1.class
+Dao/PersonagemDAO.class
+Model/Ranking.class
+Controller/MissaoController.class
 Controller/NovoJogador.class
 Dao/ConexaoDB.class
 Controller/CreditosController.class
