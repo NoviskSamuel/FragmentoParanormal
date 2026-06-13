@@ -8,7 +8,7 @@ public class ConexaoDB {
 
     private static Connection conexao;
 
-    private static final String URL     = "jdbc:postgresql://localhost:5432/fragmentoparanormal";
+    private static final String URL     = "jdbc:postgresql://localhost:5432/FragmentoParanormal";
     private static final String USUARIO = "postgres";
     private static final String SENHA   = "1234";
 

@@ -1,5 +1,6 @@
 package Util;
 
+import Model.Batalha;
 import Model.Missao;
 import Model.Personagem;
 import javafx.fxml.FXMLLoader;
@@ -32,18 +33,25 @@ public class ScreenManager {
     private Personagem personagemAtivo;
     private Missao     missaoAtiva;
 
+    private Batalha batalhaSalva;
+    private int     inimigosMortosSalvos;
+    private int     moedasSessaoSalvas;
+    private String  narrativaSalva;
+    private boolean estadoMissaoSalvo = false;
+
     public static final String TELA_INICIAL      = "primary";
     public static final String TELA_JOGAR        = "jogar";
     public static final String TELA_NOVO_JOGADOR = "novo_jogador";
     public static final String TELA_CONFIRMACAO  = "confirmacao";
     public static final String TELA_MISSOES      = "missoes";
     public static final String TELA_MISSAO       = "missao";
-    public static final String TELA_BATALHA      = "batalha";
     public static final String TELA_INVENTARIO   = "inventario";
     public static final String TELA_LEVEL_UP     = "level_up";
     public static final String TELA_RANKING      = "ranking";
     public static final String TELA_CREDITOS     = "creditos";
-
+    public static final String TELA_DESCANSO     = "descanso";
+    
+    
     public void init(Stage stage) throws IOException {
         this.stage = stage;
         Parent root = carregar(TELA_INICIAL);
@@ -87,12 +95,35 @@ public class ScreenManager {
     public Missao getMissaoAtiva()                     { return missaoAtiva; }
     public void   setMissaoAtiva(Missao m)             { this.missaoAtiva = m; }
 
+    public void salvarEstadoMissao(Batalha batalha, int inimigosMortos, int moedasSessao, String narrativa) {
+        this.batalhaSalva         = batalha;
+        this.inimigosMortosSalvos = inimigosMortos;
+        this.moedasSessaoSalvas   = moedasSessao;
+        this.narrativaSalva       = narrativa;
+        this.estadoMissaoSalvo    = true;
+    }
+
+    public boolean temEstadoMissaoSalvo()  { return estadoMissaoSalvo; }
+    public Batalha getBatalhaSalva()       { return batalhaSalva; }
+    public int     getInimigosMortosSalvos() { return inimigosMortosSalvos; }
+    public int     getMoedasSessaoSalvas()   { return moedasSessaoSalvas; }
+    public String  getNarrativaSalva()       { return narrativaSalva; }
+
+    public void limparEstadoMissao() {
+        this.batalhaSalva         = null;
+        this.inimigosMortosSalvos = 0;
+        this.moedasSessaoSalvas   = 0;
+        this.narrativaSalva       = null;
+        this.estadoMissaoSalvo    = false;
+    }
+
     public Stage  getStage()                           { return stage; }
 
     public void limparSessao() {
         personagemAtivo = null;
         missaoAtiva     = null;
         historico.clear();
+        limparEstadoMissao();
     }
 
     private void trocar(String fxml) {

@@ -2,7 +2,7 @@ module fragmentoparanormal {
     requires java.sql;
     requires javafx.controls;
     requires javafx.fxml;
-    requires java.base;
+    requires javafx.media;
 
     opens Default to javafx.fxml;
     opens Controller to javafx.fxml;

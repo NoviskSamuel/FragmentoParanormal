@@ -23,6 +23,18 @@ public class Personagem {
     private int vidaAtual;
     private int moedas;
 
+    public static final int STAMINA_MAXIMA_PADRAO    = 100;
+    public static final int CUSTO_STAMINA_INVESTIGAR = 10;
+    public static final int CUSTO_STAMINA_AVANCAR    = 5;
+    public static final int CUSTO_STAMINA_ATACAR     = 8;
+    public static final int CUSTO_STAMINA_RITUAL     = 12;
+    public static final int CUSTO_STAMINA_FUGIR      = 5;
+    public static final int SEGUNDOS_POR_PONTO_REGEN = 30;
+
+    private int staminaMaxima = STAMINA_MAXIMA_PADRAO;
+    private int staminaAtual  = STAMINA_MAXIMA_PADRAO;
+    private java.time.LocalDateTime staminaAtualizadaEm = java.time.LocalDateTime.now();
+
     private Inventario inventario = new Inventario();
 
     public Personagem() {}
@@ -81,8 +93,30 @@ public class Personagem {
     }
 
     public boolean ganharXP(int xp) {
-        if (xp <= 0) return false;
-        this.xpAtual += xp;
+        return ganharXP(xp, this.nivel);
+    }
+
+    public boolean ganharXP(int xpBase, int nivelFonte) {
+        if (xpBase <= 0) return false;
+
+        int diff = this.nivel - nivelFonte;
+        double fator;
+        if (diff <= 0) {
+            fator = 1.0;
+        } else if (diff == 1) {
+            fator = 0.6;
+        } else if (diff == 2) {
+            fator = 0.3;
+        } else if (diff == 3) {
+            fator = 0.1;
+        } else {
+            fator = 0.0;
+        }
+
+        int xpFinal = (int) Math.round(xpBase * fator);
+        if (xpFinal <= 0) return false;
+
+        this.xpAtual += xpFinal;
         boolean subiu = false;
         while (this.xpProximoNivel > 0 && this.xpAtual >= this.xpProximoNivel) {
             this.xpAtual -= this.xpProximoNivel;
@@ -108,6 +142,46 @@ public class Personagem {
 
     public void restaurarVidaTotal() {
         this.vidaAtual = this.vidaMaxima;
+    }
+
+    public void regenerarStamina() {
+        if (staminaAtual >= staminaMaxima) {
+            staminaAtualizadaEm = java.time.LocalDateTime.now();
+            return;
+        }
+        long segundos = java.time.Duration.between(staminaAtualizadaEm, java.time.LocalDateTime.now()).getSeconds();
+        if (segundos <= 0) return;
+
+        int pontosRegenerados = (int) (segundos / SEGUNDOS_POR_PONTO_REGEN);
+        if (pontosRegenerados > 0) {
+            this.staminaAtual = Math.min(staminaMaxima, staminaAtual + pontosRegenerados);
+            long restoSegundos = segundos % SEGUNDOS_POR_PONTO_REGEN;
+            this.staminaAtualizadaEm = java.time.LocalDateTime.now().minusSeconds(restoSegundos);
+        }
+    }
+
+    public boolean temStaminaPara(int custo) {
+        regenerarStamina();
+        return staminaAtual >= custo;
+    }
+
+    public boolean consumirStamina(int custo) {
+        regenerarStamina();
+        if (staminaAtual < custo) return false;
+        staminaAtual -= custo;
+        staminaAtualizadaEm = java.time.LocalDateTime.now();
+        return true;
+    }
+
+    public void restaurarStaminaTotal() {
+        this.staminaAtual = this.staminaMaxima;
+        this.staminaAtualizadaEm = java.time.LocalDateTime.now();
+    }
+
+    public void recuperarStamina(int quantidade) {
+        if (quantidade <= 0) return;
+        this.staminaAtual = Math.min(staminaMaxima, this.staminaAtual + quantidade);
+        this.staminaAtualizadaEm = java.time.LocalDateTime.now();
     }
 
     public int    getId()                         { return id; }
@@ -142,4 +216,11 @@ public class Personagem {
     public void setMoedas(int moedas)             { this.moedas = Math.max(0, moedas); }
     public Inventario getInventario()             { return inventario; }
     public void       setInventario(Inventario i) { this.inventario = i; }
+
+    public int  getStaminaMaxima()                       { return staminaMaxima; }
+    public void setStaminaMaxima(int staminaMaxima)      { this.staminaMaxima = Math.max(1, staminaMaxima); }
+    public int  getStaminaAtual()                        { return staminaAtual; }
+    public void setStaminaAtual(int staminaAtual)        { this.staminaAtual = Math.max(0, Math.min(staminaAtual, staminaMaxima)); }
+    public java.time.LocalDateTime getStaminaAtualizadaEm()        { return staminaAtualizadaEm; }
+    public void setStaminaAtualizadaEm(java.time.LocalDateTime dt) { this.staminaAtualizadaEm = dt != null ? dt : java.time.LocalDateTime.now(); }
 }

@@ -11,7 +11,8 @@
         <Label fx:id="labelObjetivo"  styleClass="label-objetivo"/>
         <Label fx:id="labelSala"      styleClass="label-sala"/>
         <HBox alignment="CENTER" spacing="30">
-            <Label fx:id="labelVida"       styleClass="label-vida"/>
+            <Label fx:id="labelVida"        styleClass="label-vida"/>
+            <Label fx:id="labelStamina"     styleClass="label-stamina"/>
             <Label fx:id="labelVidaInimigo" styleClass="label-vida-inimigo" visible="false"/>
         </HBox>
         <HBox alignment="CENTER" spacing="40" VBox.vgrow="ALWAYS">
@@ -21,16 +22,17 @@
         <Label fx:id="labelNarrative" styleClass="label-narrativa" wrapText="true"/>
         <Label fx:id="labelFragmento" styleClass="label-fragmento"/>
         <HBox fx:id="painelAcoesMissao" alignment="CENTER" spacing="14">
-            <Button text="Avançar"    onAction="#onAvancar"    styleClass="btn-acao"/>
-            <Button text="Investigar" onAction="#onInvestigar" styleClass="btn-acao"/>
-            <Button text="Inventário" onAction="#onInventario" styleClass="btn-acao"/>
-            <Button text="Fugir"      onAction="#onFugirMissao" styleClass="btn-fuga"/>
+            <Button text="Avançar"     onAction="#onAvancar"     styleClass="btn-acao"/>
+            <Button text="Investigar"  onAction="#onInvestigar"  styleClass="btn-acao"/>
+            <Button text="Inventário"  onAction="#onInventario"  styleClass="btn-acao"/>
+            <Button text="🌙 Descansar" onAction="#onDescansar"  styleClass="btn-acao"/>
+            <Button text="Fugir"       onAction="#onFugirMissao" styleClass="btn-fuga"/>
         </HBox>
         <HBox fx:id="painelBatalha" alignment="CENTER" spacing="14" visible="false">
-            <Button text="Atacar"      onAction="#onAtacar"      styleClass="btn-acao"/>
-            <Button text="Ritual"      onAction="#onRitual"      styleClass="btn-acao"/>
-            <Button text="Equipar Arma" onAction="#onEquiparArma" styleClass="btn-acao"/>
-            <Button text="Fugir"       onAction="#onFugirBatalha" styleClass="btn-fuga"/>
+            <Button text="Atacar"       onAction="#onAtacar"       styleClass="btn-acao"/>
+            <Button text="Ritual"       onAction="#onRitual"       styleClass="btn-acao"/>
+            <Button text="Equipar Arma" onAction="#onEquiparArma"  styleClass="btn-acao"/>
+            <Button text="Fugir"        onAction="#onFugirBatalha" styleClass="btn-fuga"/>
         </HBox>
         <VBox fx:id="painelItem" styleClass="painel-item" visible="false" spacing="6">
             <Label fx:id="labelItemEncontrado" styleClass="label-item"/>
