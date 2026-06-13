@@ -1,244 +1,4 @@
-.root {
-    -fx-font-family: "Segoe UI", sans-serif;
-}
-
-.tela-fundo {
-    -fx-background-color: #000000;
-}
-
-.titulo-principal {
-    -fx-font-size: 48px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #cc2200;
-    -fx-effect: dropshadow(gaussian, #660000, 16, 0.6, 0, 0);
-    -fx-font-family: "Georgia", serif;
-}
-
-.titulo-painel {
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #cc3300;
-    -fx-padding: 6 0 6 0;
-}
-
-.btn-menu {
-    -fx-background-color: transparent;
-    -fx-text-fill: #cc3300;
-    -fx-font-size: 22px;
-    -fx-font-weight: bold;
-    -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, #660000, 6, 0.3, 0, 0);
-}
-
-.btn-menu:hover {
-    -fx-text-fill: #ff5500;
-    -fx-effect: dropshadow(gaussian, #ff3300, 12, 0.6, 0, 0);
-}
-
-.btn-grande {
-    -fx-background-color: #1a0000;
-    -fx-border-color: #660000;
-    -fx-border-width: 2;
-    -fx-text-fill: #cc3300;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-padding: 12 20 12 20;
-    -fx-cursor: hand;
-}
-
-.btn-grande:hover {
-    -fx-background-color: #330000;
-    -fx-text-fill: #ff5500;
-}
-
-.btn-acao {
-    -fx-background-color: #2a0000;
-    -fx-border-color: #880000;
-    -fx-border-width: 1;
-    -fx-text-fill: #cc3300;
-    -fx-font-size: 14px;
-    -fx-padding: 8 16 8 16;
-    -fx-cursor: hand;
-}
-
-.btn-acao:hover {
-    -fx-background-color: #440000;
-    -fx-text-fill: #ff4400;
-}
-
-.btn-fuga {
-    -fx-background-color: #1a0000;
-    -fx-border-color: #550000;
-    -fx-text-fill: #993300;
-    -fx-font-size: 13px;
-    -fx-padding: 8 14 8 14;
-    -fx-cursor: hand;
-}
-
-.btn-confirmar {
-    -fx-background-color: #3a0a0a;
-    -fx-border-color: #aa2200;
-    -fx-border-width: 2;
-    -fx-text-fill: #ff6633;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-    -fx-padding: 10 22 10 22;
-    -fx-cursor: hand;
-}
-
-.btn-sair {
-    -fx-background-color: transparent;
-    -fx-border-color: #550000;
-    -fx-text-fill: #880000;
-    -fx-font-size: 14px;
-    -fx-padding: 10 20 10 20;
-    -fx-cursor: hand;
-}
-
-.btn-aceitar {
-    -fx-background-color: #2a0a00;
-    -fx-border-color: #883300;
-    -fx-border-width: 2;
-    -fx-text-fill: #cc5500;
-    -fx-font-size: 16px;
-    -fx-padding: 10 24 10 24;
-    -fx-cursor: hand;
-}
-
-.btn-recusar {
-    -fx-background-color: #1a0000;
-    -fx-border-color: #550000;
-    -fx-text-fill: #772200;
-    -fx-font-size: 16px;
-    -fx-padding: 10 24 10 24;
-    -fx-cursor: hand;
-}
-
-.btn-up {
-    -fx-background-color: #2a0000;
-    -fx-border-color: #770000;
-    -fx-text-fill: #cc3300;
-    -fx-font-size: 14px;
-    -fx-padding: 4 12 4 12;
-    -fx-cursor: hand;
-}
-
-.painel-formulario {
-    -fx-background-color: #2a0404;
-    -fx-border-color: #660000;
-    -fx-border-width: 2;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-padding: 18 28 18 28;
-    -fx-max-width: 620;
-}
-
-.label-campo {
-    -fx-text-fill: #cc4422;
-    -fx-font-size: 14px;
-    -fx-min-width: 100;
-}
-
-.label-desc {
-    -fx-text-fill: #994422;
-    -fx-font-size: 12px;
-}
-
-.label-narrativa {
-    -fx-text-fill: #cc5533;
-    -fx-font-size: 16px;
-    -fx-text-alignment: CENTER;
-}
-
-.label-vida {
-    -fx-text-fill: #cc2200;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-}
-
-.label-vida-inimigo {
-    -fx-text-fill: #aa2200;
-    -fx-font-size: 14px;
-}
-
-.label-stamina {
-    -fx-text-fill: #ddaa33;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-}
-
-.label-objetivo {
-    -fx-text-fill: #cc5533;
-    -fx-font-size: 13px;
-}
-
-.label-sala {
-    -fx-text-fill: #884422;
-    -fx-font-size: 12px;
-}
-
-.label-fragmento {
-    -fx-text-fill: #cc7744;
-    -fx-font-size: 13px;
-}
-
-.label-item {
-    -fx-text-fill: #ff8855;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-}
-
-.label-erro {
-    -fx-text-fill: #ff4444;
-    -fx-font-size: 13px;
-}
-
-.label-classe {
-    -fx-text-fill: #995533;
-    -fx-font-size: 13px;
-}
-
-.label-nivel {
-    -fx-text-fill: #cc7744;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-}
-
-.label-nome-personagem {
-    -fx-text-fill: #cc8855;
-    -fx-font-size: 14px;
-    -fx-font-style: italic;
-}
-
-.label-credito-titulo {
-    -fx-text-fill: #cc5533;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-}
-
-.label-credito {
-    -fx-text-fill: #995533;
-    -fx-font-size: 14px;
-}
-
-.label-titulo-missao {
-    -fx-text-fill: #ff6633;
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-}
-
-.label-atributo {
-    -fx-text-fill: #cc7744;
-    -fx-font-size: 14px;
-    -fx-min-width: 40;
-}
-
-.label-pontos {
-    -fx-text-fill: #ff9944;
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-}
-
+/* ── Configurações Gerais da Interface Sombria ─────────────────── */
 .campo-texto {
     -fx-background-color: #660000;
     -fx-text-fill: #ffccbb;
@@ -282,6 +42,7 @@
     -fx-padding: 10;
 }
 
+/* ── Tabelas e Missões ─────────────────────────────────────────── */
 .tabela-ranking {
     -fx-background-color: #1a0000;
     -fx-border-color: #550000;
@@ -305,12 +66,76 @@
     -fx-font-weight: bold;
 }
 
-.titulo-missao {
-    -fx-text-fill: #cc3300;
-    -fx-font-size: 20px;
+.titulo-missao, .label-titulo-missao {
+    -fx-text-fill: #ff6633;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
 }
 
+/* ── Labels de Atributos e Status ──────────────────────────────── */
+.label-stamina {
+    -fx-text-fill: #ddaa33;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.label-objetivo {
+    -fx-text-fill: #cc5533;
+    -fx-font-size: 13px;
+}
+
+.label-sala {
+    -fx-text-fill: #884422;
+    -fx-font-size: 12px;
+}
+
+.label-fragmento {
+    -fx-text-fill: #cc7744;
+    -fx-font-size: 13px;
+}
+
+.label-item {
+    -fx-text-fill: #cc7744;
+    -fx-font-size: 13px;
+}
+
+.label-nivel {
+    -fx-text-fill: #cc7744;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.label-nome-personagem {
+    -fx-text-fill: #cc8855;
+    -fx-font-size: 14px;
+    -fx-font-style: italic;
+}
+
+.label-atributo {
+    -fx-text-fill: #cc7744;
+    -fx-font-size: 14px;
+    -fx-min-width: 40;
+}
+
+.label-pontos {
+    -fx-text-fill: #ff9944;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+/* ── Créditos ──────────────────────────────────────────────────── */
+.label-credito-titulo {
+    -fx-text-fill: #cc5533;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.label-credito {
+    -fx-text-fill: #995533;
+    -fx-font-size: 14px;
+}
+
+/* ── Minigame de Descanso Paranormal (Tema Vermelho/Sangue) ────── */
 .painel-descanso-header {
     -fx-background-color: #0d0000;
     -fx-border-color: #550000;
@@ -358,6 +183,7 @@
     -fx-font-size: 12px;
 }
 
+/* ── Botões de Símbolo Base ────────────────────────────────────── */
 .btn-descanso-simbolo {
     -fx-background-color: #1a0000;
     -fx-border-color: #550000;
@@ -383,6 +209,7 @@
     -fx-cursor: default;
 }
 
+/* ── Destaques de Flash por Elemento Paranormal ─────────────────── */
 .btn-descanso-sangue {
     -fx-background-color: #3a0000;
     -fx-border-color: #ff2200;
@@ -415,6 +242,15 @@
     -fx-border-color: #9955dd;
     -fx-text-fill: #cc99ff;
     -fx-effect: dropshadow(gaussian, #6622aa, 18, 0.7, 0, 0);
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
+}
+
+.btn-descanso-ar {
+    -fx-background-color: #1a1a2a;
+    -fx-border-color: #aa88ff;
+    -fx-text-fill: #ddbbff;
+    -fx-effect: dropshadow(gaussian, #6644cc, 18, 0.7, 0, 0);
     -fx-scale-x: 1.12;
     -fx-scale-y: 1.12;
 }

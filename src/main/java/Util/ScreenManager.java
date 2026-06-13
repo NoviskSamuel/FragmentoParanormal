@@ -49,7 +49,7 @@ public class ScreenManager {
     public static final String TELA_LEVEL_UP     = "level_up";
     public static final String TELA_RANKING      = "ranking";
     public static final String TELA_CREDITOS     = "creditos";
-    public static final String TELA_DESCANSO     = "descanso";
+    public static final String TELA_DESCANSO     = "descanso"; // <-- ADICIONE APENAS ESTA LINHA
     
     
     public void init(Stage stage) throws IOException {
