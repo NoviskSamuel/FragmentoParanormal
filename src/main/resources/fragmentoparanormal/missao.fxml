@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="Controller.MissaoController"
+           styleClass="tela-fundo" prefWidth="960" prefHeight="640">
+
+    <!-- Jumpscare overlay -->
+    <ImageView fx:id="imgJumpscare" fitWidth="960" fitHeight="640"
+               visible="false" opacity="0" mouseTransparent="true"/>
+
+    <!-- Imagem de cenário de fundo -->
+    <ImageView fx:id="imgCenario" fitWidth="960" fitHeight="640"
+               opacity="0.18" mouseTransparent="true" preserveRatio="false"/>
+
+    <!-- Layout principal -->
+    <VBox spacing="0" style="-fx-padding: 0;">
+
+        <!-- HUD topo -->
+        <HBox style="-fx-background-color: linear-gradient(to right, #0a0000, #150008, #0a0000);
+                     -fx-border-color: #330011; -fx-border-width: 0 0 2 0;
+                     -fx-padding: 8 16 8 16;"
+              alignment="CENTER_LEFT" spacing="0">
+            <Label fx:id="labelTitulo" styleClass="titulo-missao" HBox.hgrow="ALWAYS"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <VBox alignment="CENTER_RIGHT" spacing="2">
+                <Label fx:id="labelVida"    styleClass="label-vida"/>
+                <Label fx:id="labelStamina" styleClass="label-stamina"/>
+            </VBox>
+        </HBox>
+
+        <!-- Barra de objetivo -->
+        <HBox style="-fx-background-color: #0d0003; -fx-padding: 5 16 5 16;"
+              alignment="CENTER_LEFT" spacing="20">
+            <Label fx:id="labelObjetivo"  styleClass="label-objetivo"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="labelSala"      styleClass="label-sala"/>
+        </HBox>
+
+        <!-- Área central: personagem vs inimigo -->
+        <StackPane VBox.vgrow="ALWAYS">
+            <!-- Vida do inimigo sobre a área -->
+            <Label fx:id="labelVidaInimigo" styleClass="label-vida-inimigo"
+                   visible="false" StackPane.alignment="TOP_CENTER"
+                   style="-fx-padding: 8 0 0 0;"/>
+
+            <HBox alignment="CENTER" spacing="60"
+                  style="-fx-padding: 10 40 10 40;">
+                <VBox alignment="CENTER" spacing="6">
+                    <ImageView fx:id="imgPersonagem" fitWidth="150" fitHeight="190" preserveRatio="true"/>
+                </VBox>
+                <VBox alignment="CENTER" spacing="6">
+                    <ImageView fx:id="imgInimigo" fitWidth="150" fitHeight="190"
+                               preserveRatio="true" visible="false"/>
+                </VBox>
+            </HBox>
+        </StackPane>
+
+        <!-- Caixa de narrativa -->
+        <VBox style="-fx-background-color: linear-gradient(to bottom, #0d0003, #0a0005);
+                     -fx-border-color: #330011; -fx-border-width: 1 0 0 0;
+                     -fx-padding: 10 16 8 16;" spacing="6">
+            <Label fx:id="labelNarrative" styleClass="label-narrativa"
+                   wrapText="true" style="-fx-min-height: 40;"/>
+            <Label fx:id="labelFragmento" styleClass="label-fragmento"/>
+        </VBox>
+
+        <!-- Painel item encontrado -->
+        <VBox fx:id="painelItem" styleClass="painel-item" visible="false"
+              spacing="8" style="-fx-margin: 0 16 0 16;">
+            <Label fx:id="labelItemEncontrado" styleClass="label-item"/>
+            <Label fx:id="labelItemDesc"       styleClass="label-desc"/>
+            <Button text="OK" onAction="#onFecharItem" styleClass="btn-acao"
+                    style="-fx-min-width: 80px;"/>
+        </VBox>
+
+        <!-- Botões de ação da missão -->
+        <HBox fx:id="painelAcoesMissao" alignment="CENTER" spacing="10"
+              style="-fx-background-color: #0a0000; -fx-border-color: #330011;
+                     -fx-border-width: 1 0 0 0; -fx-padding: 10 16 10 16;">
+            <Button text="⟶ AVANÇAR"    onAction="#onAvancar"     styleClass="btn-acao"/>
+            <Button text="🔍 INVESTIGAR" onAction="#onInvestigar"  styleClass="btn-acao"/>
+            <Button text="🎒 INVENTÁRIO" onAction="#onInventario"  styleClass="btn-acao"/>
+            <Button text="🌙 DESCANSAR"  onAction="#onDescansar"   styleClass="btn-acao"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="↩ FUGIR"       onAction="#onFugirMissao" styleClass="btn-fuga"/>
+        </HBox>
+
+        <!-- Botões de batalha -->
+        <HBox fx:id="painelBatalha" alignment="CENTER" spacing="10"
+              visible="false"
+              style="-fx-background-color: #0a0000; -fx-border-color: #660022;
+                     -fx-border-width: 1 0 0 0; -fx-padding: 10 16 10 16;">
+            <Button text="⚔ ATACAR"      onAction="#onAtacar"       styleClass="btn-acao"
+                    style="-fx-min-width: 140px;"/>
+            <Button text="✦ RITUAL"       onAction="#onRitual"       styleClass="btn-acao"/>
+            <Button text="🗡 EQUIPAR ARMA" onAction="#onEquiparArma"  styleClass="btn-acao"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="↩ FUGIR"        onAction="#onFugirBatalha" styleClass="btn-fuga"/>
+        </HBox>
+
+    </VBox>
+</StackPane>

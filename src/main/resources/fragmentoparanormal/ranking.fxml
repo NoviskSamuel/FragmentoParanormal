@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="Controller.RankingController"
+           styleClass="tela-fundo" prefWidth="960" prefHeight="640">
+
+    <ImageView fitWidth="80" fitHeight="80" opacity="0.12" mouseTransparent="true"
+               StackPane.alignment="TOP_LEFT" translateX="20" translateY="20">
+        <image><Image url="@../images/elementos/sangue.png" backgroundLoading="true"/></image>
+    </ImageView>
+    <ImageView fitWidth="80" fitHeight="80" opacity="0.12" mouseTransparent="true"
+               StackPane.alignment="TOP_RIGHT" translateX="-20" translateY="20">
+        <image><Image url="@../images/elementos/morte.png" backgroundLoading="true"/></image>
+    </ImageView>
+    <ImageView fitWidth="80" fitHeight="80" opacity="0.10" mouseTransparent="true"
+               StackPane.alignment="BOTTOM_LEFT" translateX="20" translateY="-20">
+        <image><Image url="@../images/elementos/energia.webp" backgroundLoading="true"/></image>
+    </ImageView>
+    <ImageView fitWidth="80" fitHeight="80" opacity="0.10" mouseTransparent="true"
+               StackPane.alignment="BOTTOM_RIGHT" translateX="-20" translateY="-20">
+        <image><Image url="@../images/elementos/conhecimento.webp" backgroundLoading="true"/></image>
+    </ImageView>
+
+    <VBox alignment="CENTER" spacing="16" style="-fx-padding: 30;">
+        <Label text="LEADERBOARD" styleClass="titulo-principal" style="-fx-font-size: 40px;"/>
+        <Label text="─ OS MELHORES AGENTES DA ORDEM ─"
+               style="-fx-text-fill: #550011; -fx-font-family: 'Georgia', serif;
+                      -fx-font-size: 13px; -fx-font-style: italic; -fx-padding: 0 0 8 0;"/>
+
+        <TableView fx:id="tabelaRanking" styleClass="tabela-ranking"
+                   prefHeight="380" prefWidth="740">
+            <columns>
+                <TableColumn fx:id="colPosicao"  text="#"        prefWidth="55"/>
+                <TableColumn fx:id="colNome"      text="AGENTE"   prefWidth="220"/>
+                <TableColumn fx:id="colNivel"     text="NÍV"      prefWidth="65"/>
+                <TableColumn fx:id="colMoedas"    text="PONTOS"   prefWidth="130"/>
+                <TableColumn fx:id="colInimigos"  text="ABATIDOS" prefWidth="110"/>
+            </columns>
+        </TableView>
+
+        <Label fx:id="labelErro" styleClass="label-erro"/>
+        <Button text="VOLTAR" onAction="#onVoltar" styleClass="btn-menu"
+                style="-fx-min-width: 200px;"/>
+    </VBox>
+
+    <Label text="✦  FRAGMENTO PARANORMAL  ✦"
+           style="-fx-text-fill: #330000; -fx-font-size: 11px; -fx-font-family: 'Georgia', serif;"
+           StackPane.alignment="BOTTOM_CENTER" translateY="-12"/>
+</StackPane>

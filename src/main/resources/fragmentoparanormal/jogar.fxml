@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="Controller.JogarController"
+           styleClass="tela-fundo" prefWidth="960" prefHeight="640">
+
+    <ImageView fitWidth="90" fitHeight="90" opacity="0.14" mouseTransparent="true"
+               StackPane.alignment="TOP_LEFT" translateX="24" translateY="24">
+        <image><Image url="@../images/elementos/morte.png" backgroundLoading="true"/></image>
+    </ImageView>
+    <ImageView fitWidth="90" fitHeight="90" opacity="0.14" mouseTransparent="true"
+               StackPane.alignment="TOP_RIGHT" translateX="-24" translateY="24">
+        <image><Image url="@../images/elementos/energia.webp" backgroundLoading="true"/></image>
+    </ImageView>
+    <ImageView fitWidth="90" fitHeight="90" opacity="0.12" mouseTransparent="true"
+               StackPane.alignment="BOTTOM_LEFT" translateX="24" translateY="-24">
+        <image><Image url="@../images/elementos/sangue.png" backgroundLoading="true"/></image>
+    </ImageView>
+    <ImageView fitWidth="90" fitHeight="90" opacity="0.12" mouseTransparent="true"
+               StackPane.alignment="BOTTOM_RIGHT" translateX="-24" translateY="-24">
+        <image><Image url="@../images/elementos/conhecimento.webp" backgroundLoading="true"/></image>
+    </ImageView>
+
+    <VBox alignment="CENTER" spacing="0">
+        <Label text="FRAGMENTO"  styleClass="titulo-principal"/>
+        <Label text="PARANORMAL" styleClass="titulo-principal"/>
+        <Label text="─────────────────────────────"
+               style="-fx-text-fill: #440000; -fx-font-size: 14px; -fx-padding: 2 0 24 0;"/>
+
+        <VBox styleClass="painel-formulario" alignment="CENTER" spacing="20" style="-fx-max-width: 560px;">
+            <Label text="SELECIONAR AGENTE" styleClass="titulo-painel"/>
+
+            <VBox spacing="14" alignment="CENTER">
+                <Button text="JOGAR COM NOVO AGENTE"      onAction="#onNovoJogador"       styleClass="btn-menu"/>
+                <Button text="JOGAR COM AGENTE EXISTENTE" onAction="#onConfirmarExistente" styleClass="btn-menu"/>
+            </VBox>
+
+            <ComboBox fx:id="comboPersonagens" styleClass="combo-personagem" prefWidth="340"
+                      promptText="— selecione um agente —"/>
+            <Label fx:id="labelErro" styleClass="label-erro"/>
+
+            <Button text="SAIR" onAction="#onSair" styleClass="btn-sair"/>
+        </VBox>
+    </VBox>
+
+    <Label text="✦  FRAGMENTO PARANORMAL  ✦"
+           style="-fx-text-fill: #330000; -fx-font-size: 11px; -fx-font-family: 'Georgia', serif;"
+           StackPane.alignment="BOTTOM_CENTER" translateY="-12"/>
+</StackPane>

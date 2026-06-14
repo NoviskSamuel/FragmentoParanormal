@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="Controller.LevelUpController"
+           styleClass="tela-fundo" prefWidth="960" prefHeight="640">
+
+    <ImageView fitWidth="130" fitHeight="130" opacity="0.08" mouseTransparent="true"
+               StackPane.alignment="CENTER">
+        <image><Image url="@../images/elementos/conhecimento.webp" backgroundLoading="true"/></image>
+    </ImageView>
+
+    <VBox alignment="CENTER" spacing="0">
+        <!-- Header -->
+        <Label text="✦  SUBIU DE NÍVEL!  ✦" styleClass="titulo-principal"
+               style="-fx-font-size: 36px;"/>
+        <Label fx:id="labelNivel" styleClass="label-nivel"
+               style="-fx-font-size: 22px; -fx-padding: 4 0 20 0;"/>
+
+        <!-- Painel de distribuição -->
+        <VBox styleClass="painel-formulario" alignment="CENTER" spacing="16"
+              style="-fx-max-width: 500px;">
+            <Label text="DISTRIBUA SEUS PONTOS" styleClass="titulo-painel"
+                   style="-fx-font-size: 18px;"/>
+
+            <Label fx:id="labelPontosRestantes" styleClass="label-pontos"
+                   style="-fx-font-size: 18px;"/>
+
+            <VBox spacing="10">
+                <!-- Força -->
+                <HBox alignment="CENTER" spacing="10"
+                      style="-fx-background-color: #150003; -fx-border-color: #2a0008;
+                             -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;
+                             -fx-padding: 8 14 8 14;">
+                    <Label text="⚔  FORÇA" styleClass="label-campo" prefWidth="180"/>
+                    <Button text="−" onAction="#onDownForca"       styleClass="btn-up"
+                            style="-fx-background-color: #220000; -fx-border-color: #440000;
+                                   -fx-text-fill: #884422;"/>
+                    <Label fx:id="labelForca"        styleClass="label-atributo" prefWidth="40" textAlignment="CENTER"/>
+                    <Button text="+" onAction="#onUpForca"         styleClass="btn-up"/>
+                </HBox>
+
+                <!-- Poder Paranormal -->
+                <HBox alignment="CENTER" spacing="10"
+                      style="-fx-background-color: #150003; -fx-border-color: #2a0008;
+                             -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;
+                             -fx-padding: 8 14 8 14;">
+                    <Label text="✦  PODER PARANORMAL" styleClass="label-campo" prefWidth="180"/>
+                    <Button text="−" onAction="#onDownPoder"       styleClass="btn-up"
+                            style="-fx-background-color: #220000; -fx-border-color: #440000;
+                                   -fx-text-fill: #884422;"/>
+                    <Label fx:id="labelPoder"        styleClass="label-atributo" prefWidth="40" textAlignment="CENTER"/>
+                    <Button text="+" onAction="#onUpPoder"         styleClass="btn-up"/>
+                </HBox>
+
+                <!-- Investigação -->
+                <HBox alignment="CENTER" spacing="10"
+                      style="-fx-background-color: #150003; -fx-border-color: #2a0008;
+                             -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;
+                             -fx-padding: 8 14 8 14;">
+                    <Label text="🔍  INVESTIGAÇÃO" styleClass="label-campo" prefWidth="180"/>
+                    <Button text="−" onAction="#onDownInvestigacao" styleClass="btn-up"
+                            style="-fx-background-color: #220000; -fx-border-color: #440000;
+                                   -fx-text-fill: #884422;"/>
+                    <Label fx:id="labelInvestigacao" styleClass="label-atributo" prefWidth="40" textAlignment="CENTER"/>
+                    <Button text="+" onAction="#onUpInvestigacao"   styleClass="btn-up"/>
+                </HBox>
+
+                <!-- Vida -->
+                <HBox alignment="CENTER" spacing="10"
+                      style="-fx-background-color: #150003; -fx-border-color: #2a0008;
+                             -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;
+                             -fx-padding: 8 14 8 14;">
+                    <Label text="❤  VIDA" styleClass="label-campo" prefWidth="180"/>
+                    <Button text="−" onAction="#onDownVida"        styleClass="btn-up"
+                            style="-fx-background-color: #220000; -fx-border-color: #440000;
+                                   -fx-text-fill: #884422;"/>
+                    <Label fx:id="labelVida"         styleClass="label-atributo" prefWidth="40" textAlignment="CENTER"/>
+                    <Button text="+" onAction="#onUpVida"          styleClass="btn-up"/>
+                </HBox>
+            </VBox>
+
+            <Button text="CONFIRMAR" onAction="#onConfirmar" styleClass="btn-confirmar"
+                    style="-fx-min-width: 200px; -fx-margin: 8 0 0 0;"/>
+        </VBox>
+    </VBox>
+</StackPane>

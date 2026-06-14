@@ -31,7 +31,7 @@ public class ScreenManager {
     private static final int MAX_HISTORICO = 20;
 
     private Personagem personagemAtivo;
-    private Missao     missaoAtiva;
+    private Missao      missaoAtiva;
 
     private Batalha batalhaSalva;
     private int     inimigosMortosSalvos;
@@ -49,21 +49,55 @@ public class ScreenManager {
     public static final String TELA_LEVEL_UP     = "level_up";
     public static final String TELA_RANKING      = "ranking";
     public static final String TELA_CREDITOS     = "creditos";
-    public static final String TELA_DESCANSO     = "descanso"; // <-- ADICIONE APENAS ESTA LINHA
-    
+    public static final String TELA_DESCANSO     = "descanso"; 
     
     public void init(Stage stage) throws IOException {
         this.stage = stage;
         Parent root = carregar(TELA_INICIAL);
         this.scene = new Scene(root, 960, 640);
 
-        URL css = getClass().getResource("/com/mycompany/fragmentoparanormal/css/estilo.css");
-        if (css != null) scene.getStylesheets().add(css.toExternalForm());
+        // Tenta carregar o estilo de forma segura
+        URL css = ScreenManager.class.getResource("/fragmentoparanormal/estilo.css");
+        if (css == null) {
+            css = ScreenManager.class.getResource("/estilo.css");
+        }
+        
+        if (css != null) {
+            scene.getStylesheets().add(css.toExternalForm());
+        } else {
+            System.out.println("Aviso: estilo.css não encontrado. Iniciando sem estilos visuais.");
+        }
 
         stage.setScene(scene);
         stage.setTitle("Fragmento Paranormal");
         stage.setResizable(false);
         stage.show();
+    }
+
+    private Parent carregar(String fxml) throws IOException {
+        String nomeArquivo = fxml + ".fxml";
+        URL url = null;
+
+        // Tentativa 1: Procurar dentro do pacote 'fragmentoparanormal'
+        url = ScreenManager.class.getResource("/fragmentoparanormal/" + nomeArquivo);
+
+        // Tentativa 2: Procurar direto na raiz de resources
+        if (url == null) {
+            url = ScreenManager.class.getResource("/" + nomeArquivo);
+        }
+
+        // Tentativa 3: Forçar via ClassLoader da Thread corrente
+        if (url == null) {
+            url = Thread.currentThread().getContextClassLoader().getResource(nomeArquivo);
+        }
+
+        if (url == null) {
+            throw new IOException("Erro crítico: O arquivo [" + nomeArquivo + "] não foi encontrado em nenhuma pasta de recursos.\n" +
+                    "Verifique se o nome está correto na sua pasta src/main/resources.");
+        }
+
+        FXMLLoader loader = new FXMLLoader(url);
+        return loader.load();
     }
 
     public void ir(String fxml) {
@@ -86,6 +120,15 @@ public class ScreenManager {
             trocar(anterior);
         } else {
             trocar(TELA_INICIAL);
+        }
+    }
+
+    private void trocar(String fxml) {
+        try {
+            scene.setRoot(carregar(fxml));
+        } catch (IOException e) {
+            throw new RuntimeException(
+                "Falha ao carregar tela '" + fxml + "'. Verifique se o arquivo FXML existe.", e);
         }
     }
 
@@ -124,24 +167,5 @@ public class ScreenManager {
         missaoAtiva     = null;
         historico.clear();
         limparEstadoMissao();
-    }
-
-    private void trocar(String fxml) {
-        try {
-            scene.setRoot(carregar(fxml));
-        } catch (IOException e) {
-            throw new RuntimeException(
-                "Falha ao carregar tela '" + fxml + "'. Verifique se o arquivo FXML existe.", e);
-        }
-    }
-
-    private Parent carregar(String fxml) throws IOException {
-        String path = "/com/mycompany/fragmentoparanormal/" + fxml + ".fxml";
-        URL url = getClass().getResource(path);
-        if (url == null) {
-            throw new IOException("FXML não encontrado: " + path);
-        }
-        FXMLLoader loader = new FXMLLoader(url);
-        return loader.load();
     }
 }

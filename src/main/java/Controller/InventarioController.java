@@ -1,58 +1,235 @@
 package Controller;
 
+import Graphics.SpriteManager;
 import Model.Item;
 import Model.Personagem;
 import Util.ScreenManager;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class InventarioController {
 
+    private enum Aba { ARMAS, HABILIDADES, RITUAIS, ITENS, ARTEFATOS }
+
     @FXML private ListView<String> listaItens;
-    @FXML private Label labelDescItem;
+    @FXML private VBox   painelDetalhes;
+    @FXML private Label  labelNomeItem;
+    @FXML private Label  labelDescItem;
+
+    @FXML private Button btnAbaArmas;
+    @FXML private Button btnAbaHabilidades;
+    @FXML private Button btnAbaRituais;
+    @FXML private Button btnAbaItens;
+    @FXML private Button btnAbaArtefatos;
+
+    @FXML private ImageView imgPersonagem;
+    @FXML private Label labelNomePersonagem;
+    @FXML private Label labelClassePersonagem;
+    @FXML private Label labelElementoPersonagem;
+    @FXML private Label labelVidaPersonagem;
+    @FXML private Label labelStaminaPersonagem;
+
+    @FXML private Label labelArmaEquipada;
+    @FXML private Label labelHabilidadeEquipada;
+    @FXML private Label labelRitualEquipado;
+    @FXML private Label labelArtefatos;
 
     private Personagem jogador;
+    private Aba abaAtual = Aba.ARMAS;
+    private List<Item> itensExibidos = new ArrayList<>();
 
     @FXML
     public void initialize() {
         jogador = ScreenManager.getInstance().getPersonagemAtivo();
-        if (jogador == null) return;
-        for (Item item : jogador.getInventario().getItens()) {
-            listaItens.getItems().add(item.getNome() + " [" + item.getTipo() + "]");
-        }
+
         listaItens.getSelectionModel().selectedIndexProperty().addListener((obs, o, n) -> {
             int i = n.intValue();
-            if (i >= 0 && i < jogador.getInventario().getItens().size()) {
-                Item sel = jogador.getInventario().getItens().get(i);
-                labelDescItem.setText(sel.getDescricao());
+            if (i >= 0 && i < itensExibidos.size()) {
+                exibirDetalhes(itensExibidos.get(i));
+            } else {
+                limparDetalhes();
             }
         });
+
+        if (jogador == null) {
+            limparDetalhes();
+            return;
+        }
+
+        atualizarPainelStatus();
+        selecionarAba(Aba.ARMAS);
+    }
+
+    @FXML private void onAbaArmas()       { selecionarAba(Aba.ARMAS); }
+    @FXML private void onAbaHabilidades() { selecionarAba(Aba.HABILIDADES); }
+    @FXML private void onAbaRituais()     { selecionarAba(Aba.RITUAIS); }
+    @FXML private void onAbaItens()       { selecionarAba(Aba.ITENS); }
+    @FXML private void onAbaArtefatos()   { selecionarAba(Aba.ARTEFATOS); }
+
+    private void selecionarAba(Aba aba) {
+        this.abaAtual = aba;
+        marcarAbaAtiva();
+        carregarLista();
+        limparDetalhes();
+    }
+
+    private void marcarAbaAtiva() {
+        btnAbaArmas.getStyleClass().remove("btn-aba-ativo");
+        btnAbaHabilidades.getStyleClass().remove("btn-aba-ativo");
+        btnAbaRituais.getStyleClass().remove("btn-aba-ativo");
+        btnAbaItens.getStyleClass().remove("btn-aba-ativo");
+        btnAbaArtefatos.getStyleClass().remove("btn-aba-ativo");
+
+        Button ativo = switch (abaAtual) {
+            case ARMAS       -> btnAbaArmas;
+            case HABILIDADES -> btnAbaHabilidades;
+            case RITUAIS     -> btnAbaRituais;
+            case ITENS       -> btnAbaItens;
+            case ARTEFATOS   -> btnAbaArtefatos;
+        };
+        if (!ativo.getStyleClass().contains("btn-aba-ativo")) {
+            ativo.getStyleClass().add("btn-aba-ativo");
+        }
+    }
+
+    private void carregarLista() {
+        if (jogador == null) return;
+
+        itensExibidos = switch (abaAtual) {
+            case ARMAS       -> jogador.getInventario().getArmas();
+            case HABILIDADES -> jogador.getInventario().getHabilidades();
+            case RITUAIS     -> jogador.getInventario().getRituais();
+            case ITENS       -> jogador.getInventario().getConsumiveis();
+            case ARTEFATOS   -> jogador.getInventario().getArtefatos();
+        };
+
+        listaItens.getItems().clear();
+        if (itensExibidos.isEmpty()) {
+            listaItens.getItems().add(mensagemVazia());
+            listaItens.setDisable(true);
+        } else {
+            listaItens.setDisable(false);
+            for (Item item : itensExibidos) {
+                listaItens.getItems().add(formatarNomeItem(item));
+            }
+        }
+    }
+
+    private String mensagemVazia() {
+        return switch (abaAtual) {
+            case ARMAS       -> "Nenhuma arma encontrada ainda.";
+            case HABILIDADES -> "Nenhuma habilidade especial aprendida ainda.";
+            case RITUAIS     -> "Nenhum ritual aprendido ainda.";
+            case ITENS       -> "Nenhum item consumível no inventário.";
+            case ARTEFATOS   -> "Nenhum artefato encontrado ainda.";
+        };
+    }
+
+    private String formatarNomeItem(Item item) {
+        boolean equipado = estaEquipado(item);
+        String prefixo = equipado ? "✓ " : "";
+        String sufixo  = equipado ? "  (equipado)" : "";
+        return prefixo + item.getNome() + sufixo;
+    }
+
+    private boolean estaEquipado(Item item) {
+        return item.equals(jogador.getInventario().getArmaEquipada())
+            || item.equals(jogador.getInventario().getRitualEquipado())
+            || item.equals(jogador.getInventario().getHabilidadeEquipada())
+            || jogador.getInventario().getArtefatosEquipados().contains(item);
+    }
+
+    private void exibirDetalhes(Item item) {
+        labelNomeItem.setText(item.getNome());
+        StringBuilder desc = new StringBuilder(item.getDescricao() != null ? item.getDescricao() : "");
+        if (item.getValor() > 0) {
+            String rotuloValor = switch (item.getTipo().toUpperCase()) {
+                case "ARMA"  -> "\nDano: +" + item.getValor();
+                case "POCAO" -> "\nRecupera: " + item.getValor();
+                default      -> "\nValor: " + item.getValor();
+            };
+            desc.append(rotuloValor);
+        }
+        if (estaEquipado(item)) {
+            desc.append("\n✓ Equipado");
+        }
+        labelDescItem.setText(desc.toString());
+    }
+
+    private void limparDetalhes() {
+        labelNomeItem.setText("");
+        labelDescItem.setText(itensExibidos.isEmpty() ? "" : "Selecione um item para ver detalhes.");
     }
 
     @FXML
     private void onEquipar() {
         int i = listaItens.getSelectionModel().getSelectedIndex();
-        if (i >= 0 && i < jogador.getInventario().getItens().size()) {
-            Item sel = jogador.getInventario().getItens().get(i);
-            jogador.getInventario().equiparItem(sel);
+        if (i < 0 || i >= itensExibidos.size()) return;
+
+        Item sel = itensExibidos.get(i);
+        boolean ok = jogador.getInventario().equiparItem(sel);
+        if (ok) {
             labelDescItem.setText("✓ Equipado: " + sel.getNome());
+            carregarLista();
+            listaItens.getSelectionModel().select(i);
+            atualizarPainelStatus();
+        } else {
+            labelDescItem.setText("Este item não pode ser equipado.");
         }
     }
 
     @FXML
     private void onUsarPocao() {
         int i = listaItens.getSelectionModel().getSelectedIndex();
-        if (i >= 0 && i < jogador.getInventario().getItens().size()) {
-            Item sel = jogador.getInventario().getItens().get(i);
-            if (sel.isPocao()) {
-                jogador.curar(sel.getValor());
-                jogador.getInventario().removerItem(sel);
-                listaItens.getItems().remove(i);
-                labelDescItem.setText("✓ Poção usada. Vida restaurada!");
-            } else {
-                labelDescItem.setText("Este item não é uma poção.");
+        if (i < 0 || i >= itensExibidos.size()) return;
+
+        Item sel = itensExibidos.get(i);
+        if (sel.isPocao()) {
+            jogador.curar(sel.getValor());
+            jogador.getInventario().removerItem(sel);
+            carregarLista();
+            limparDetalhes();
+            atualizarPainelStatus();
+            labelDescItem.setText("✓ Poção usada. Vida restaurada!");
+        } else {
+            labelDescItem.setText("Este item não é consumível.");
+        }
+    }
+
+    private void atualizarPainelStatus() {
+        SpriteManager.getInstance().setSprite(imgPersonagem, jogador.getImagemPath());
+
+        labelNomePersonagem.setText(jogador.getNome() + "  •  Nível " + jogador.getNivel());
+        labelClassePersonagem.setText(jogador.getClasse().getNome());
+        labelElementoPersonagem.setText("Elemento: " + jogador.getElemento().getNome());
+        labelVidaPersonagem.setText("❤ " + jogador.getVidaAtual() + " / " + jogador.getVidaMaxima());
+        labelStaminaPersonagem.setText("⚡ " + jogador.getStaminaAtual() + " / " + jogador.getStaminaMaxima());
+
+        Item arma   = jogador.getInventario().getArmaEquipada();
+        Item ritual = jogador.getInventario().getRitualEquipado();
+        Item hab    = jogador.getInventario().getHabilidadeEquipada();
+        List<Item> artefatos = jogador.getInventario().getArtefatosEquipados();
+
+        labelArmaEquipada.setText("🗡 Arma: " + (arma != null ? arma.getNome() : "Nenhuma"));
+        labelRitualEquipado.setText("🜂 Ritual: " + (ritual != null ? ritual.getNome() : "Nenhum"));
+        labelHabilidadeEquipada.setText("✦ Habilidade: " + (hab != null ? hab.getNome() : "Nenhuma"));
+
+        if (artefatos.isEmpty()) {
+            labelArtefatos.setText("💎 Artefatos: Nenhum");
+        } else {
+            StringBuilder sb = new StringBuilder("💎 Artefatos: ");
+            for (int i = 0; i < artefatos.size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(artefatos.get(i).getNome());
             }
+            labelArtefatos.setText(sb.toString());
         }
     }
 

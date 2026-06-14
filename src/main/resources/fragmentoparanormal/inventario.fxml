@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="Controller.InventarioController"
+           styleClass="tela-fundo" prefWidth="960" prefHeight="640">
+
+    <VBox spacing="0">
+        <!-- Header -->
+        <HBox style="-fx-background-color: linear-gradient(to right, #0a0000, #150008, #0a0000);
+                     -fx-border-color: #330011; -fx-border-width: 0 0 2 0;
+                     -fx-padding: 10 20 10 20;" alignment="CENTER_LEFT">
+            <Label text="INVENTÁRIO" styleClass="titulo-painel"
+                   style="-fx-font-size: 22px; -fx-padding: 0;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="✕ FECHAR" onAction="#onVoltar" styleClass="btn-sair"
+                    style="-fx-min-width: 100px; -fx-min-height: 34px; -fx-font-size: 13px;"/>
+        </HBox>
+
+        <!-- Corpo -->
+        <HBox VBox.vgrow="ALWAYS" spacing="0">
+
+            <!-- LADO ESQUERDO: abas e listas -->
+            <VBox spacing="0" style="-fx-min-width: 580px; -fx-max-width: 580px;">
+
+                <!-- Abas de categoria -->
+                <HBox style="-fx-background-color: #0d0003; -fx-padding: 8 12 0 12;" spacing="4">
+                    <Button fx:id="btnAbaArmas"       text="⚔ ARMAS"        onAction="#onAbaArmas"       styleClass="btn-aba"/>
+                    <Button fx:id="btnAbaHabilidades" text="✦ HABILIDADES"   onAction="#onAbaHabilidades" styleClass="btn-aba"/>
+                    <Button fx:id="btnAbaRituais"     text="🜂 RITUAIS"       onAction="#onAbaRituais"     styleClass="btn-aba"/>
+                    <Button fx:id="btnAbaItens"       text="🧪 CONSUMÍVEIS"   onAction="#onAbaItens"       styleClass="btn-aba"/>
+                    <Button fx:id="btnAbaArtefatos"   text="💎 ARTEFATOS"     onAction="#onAbaArtefatos"   styleClass="btn-aba"/>
+                </HBox>
+
+                <!-- Lista de itens -->
+                <ListView fx:id="listaItens" styleClass="lista-itens"
+                          VBox.vgrow="ALWAYS" style="-fx-border-radius: 0; -fx-background-radius: 0;"/>
+
+                <!-- Painel de detalhes do item selecionado -->
+                <VBox fx:id="painelDetalhes"
+                      style="-fx-background-color: #0f0005; -fx-border-color: #330011;
+                             -fx-border-width: 1 0 0 0; -fx-padding: 10 14 10 14;" spacing="6">
+                    <Label fx:id="labelNomeItem" styleClass="label-titulo-missao"
+                           style="-fx-font-size: 15px;"/>
+                    <Label fx:id="labelDescItem" styleClass="label-desc" wrapText="true"/>
+                    <HBox spacing="10">
+                        <Button text="EQUIPAR" onAction="#onEquipar"   styleClass="btn-acao"
+                                style="-fx-min-width: 100px; -fx-min-height: 36px;"/>
+                        <Button text="USAR"    onAction="#onUsarPocao" styleClass="btn-acao"
+                                style="-fx-min-width: 100px; -fx-min-height: 36px;"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- Divisor -->
+            <Region style="-fx-background-color: #330011; -fx-min-width: 2; -fx-max-width: 2;"/>
+
+            <!-- LADO DIREITO: status do personagem -->
+            <VBox spacing="12" VBox.vgrow="ALWAYS"
+                  style="-fx-background-color: #0a0003; -fx-padding: 16 20 16 20; -fx-min-width: 376px;">
+
+                <Label text="STATUS DO AGENTE"
+                       style="-fx-text-fill: #663322; -fx-font-family: 'Georgia', serif;
+                              -fx-font-size: 12px; -fx-font-style: italic;"/>
+
+                <!-- Imagem do personagem -->
+                <HBox alignment="CENTER">
+                    <ImageView fx:id="imgPersonagem" fitWidth="120" fitHeight="150" preserveRatio="true"/>
+                </HBox>
+
+                <!-- Info básica -->
+                <VBox spacing="4"
+                      style="-fx-background-color: #150005; -fx-border-color: #330011;
+                             -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;
+                             -fx-padding: 10 14 10 14;">
+                    <Label fx:id="labelNomePersonagem" styleClass="label-nome-personagem"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label fx:id="labelClassePersonagem" styleClass="label-classe"/>
+                    <Label fx:id="labelElementoPersonagem"
+                           style="-fx-text-fill: #bb7744; -fx-font-family: 'Georgia', serif; -fx-font-size: 13px;"/>
+                    <Label text="─────────────────"
+                           style="-fx-text-fill: #330011; -fx-font-size: 11px;"/>
+                    <Label fx:id="labelVidaPersonagem"    styleClass="label-vida"/>
+                    <Label fx:id="labelStaminaPersonagem" styleClass="label-stamina"/>
+                </VBox>
+
+                <!-- Equipamentos -->
+                <VBox spacing="6"
+                      style="-fx-background-color: #0f0004; -fx-border-color: #2a000d;
+                             -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;
+                             -fx-padding: 10 14 10 14;">
+                    <Label text="EQUIPADO"
+                           style="-fx-text-fill: #663322; -fx-font-family: 'Georgia', serif;
+                                  -fx-font-size: 11px; -fx-font-style: italic;"/>
+                    <Label fx:id="labelArmaEquipada"       styleClass="label-desc"
+                           style="-fx-font-size: 13px;" wrapText="true"/>
+                    <Label fx:id="labelHabilidadeEquipada" styleClass="label-desc"
+                           style="-fx-font-size: 13px;" wrapText="true"/>
+                    <Label fx:id="labelRitualEquipado"     styleClass="label-desc"
+                           style="-fx-font-size: 13px;" wrapText="true"/>
+                    <Label fx:id="labelArtefatos"          styleClass="label-desc"
+                           style="-fx-font-size: 12px;" wrapText="true"/>
+                </VBox>
+            </VBox>
+        </HBox>
+    </VBox>
+</StackPane>

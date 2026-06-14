@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="Controller.DescansoController"
+           styleClass="tela-fundo" prefWidth="960" prefHeight="640">
+
+    <VBox spacing="0" alignment="TOP_CENTER">
+
+        <!-- Header -->
+        <HBox styleClass="painel-descanso-header" alignment="CENTER_LEFT" spacing="20"
+              style="-fx-padding: 12 24 12 24;">
+            <Label text="🌙  TURNO DE DESCANSO" styleClass="titulo-descanso"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="labelNomePersonagem" styleClass="label-nome-personagem"/>
+            <Label fx:id="labelStaminaAtual"   styleClass="label-stamina"
+                   style="-fx-padding: 0 0 0 20;"/>
+        </HBox>
+
+        <!-- Corpo -->
+        <HBox VBox.vgrow="ALWAYS" alignment="CENTER" spacing="50"
+              style="-fx-padding: 20 50 20 50;">
+
+            <!-- Personagem -->
+            <VBox alignment="CENTER" spacing="12" style="-fx-min-width: 180px;">
+                <ImageView fx:id="imgPersonagem" fitWidth="150" fitHeight="190" preserveRatio="true"/>
+                <Label text="Concentre-se nos símbolos..."
+                       styleClass="label-desc"
+                       style="-fx-text-alignment: CENTER; -fx-font-size: 13px;
+                              -fx-text-fill: #775533;"/>
+            </VBox>
+
+            <!-- Painel do minigame -->
+            <VBox alignment="CENTER" spacing="16" styleClass="painel-descanso"
+                  style="-fx-min-width: 500px;">
+
+                <Label text="— SEQUÊNCIA DE REFLEXOS —" styleClass="titulo-descanso-sub"/>
+
+                <Label fx:id="labelInstrucao" styleClass="label-descanso-instrucao"
+                       wrapText="true" style="-fx-text-alignment: CENTER; -fx-min-height: 36;"/>
+
+                <HBox alignment="CENTER" spacing="16">
+                    <Button fx:id="btnSimbolo0" text="🩸" onAction="#onSimbolo0"
+                            styleClass="btn-descanso-simbolo" disable="true"/>
+                    <Button fx:id="btnSimbolo1" text="💀" onAction="#onSimbolo1"
+                            styleClass="btn-descanso-simbolo" disable="true"/>
+                    <Button fx:id="btnSimbolo2" text="⚡" onAction="#onSimbolo2"
+                            styleClass="btn-descanso-simbolo" disable="true"/>
+                    <Button fx:id="btnSimbolo3" text="👁" onAction="#onSimbolo3"
+                            styleClass="btn-descanso-simbolo" disable="true"/>
+                </HBox>
+
+                <Label fx:id="labelFeedback" styleClass="label-descanso-feedback"
+                       wrapText="true" style="-fx-text-alignment: CENTER; -fx-min-height: 28;"/>
+
+                <Label fx:id="labelTentativas" styleClass="label-desc"
+                       style="-fx-text-fill: #775533; -fx-font-size: 13px;"/>
+
+                <HBox alignment="CENTER" spacing="24" style="-fx-padding: 4 0 0 0;">
+                    <Label text="🩸 Sangue"       styleClass="label-descanso-legenda"/>
+                    <Label text="💀 Morte"        styleClass="label-descanso-legenda"/>
+                    <Label text="⚡ Energia"       styleClass="label-descanso-legenda"/>
+                    <Label text="👁 Conhecimento" styleClass="label-descanso-legenda"/>
+                </HBox>
+
+                <Label text="✔ Sequência correta: +40 ⚡   ✘ Falha total: +10 ⚡"
+                       styleClass="label-desc"
+                       style="-fx-text-fill: #554422; -fx-font-size: 12px;"/>
+
+                <Button fx:id="btnPular" text="PULAR DESCANSO"
+                        onAction="#onPular" styleClass="btn-fuga"
+                        style="-fx-min-width: 180px;"/>
+            </VBox>
+
+        </HBox>
+    </VBox>
+</StackPane>

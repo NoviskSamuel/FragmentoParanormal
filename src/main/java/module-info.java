@@ -4,7 +4,7 @@ module fragmentoparanormal {
     requires javafx.fxml;
     requires javafx.media;
 
-    opens Default to javafx.fxml;
+    opens Default to javafx.fxml, javafx.graphics;
     opens Controller to javafx.fxml;
     opens Util to javafx.fxml;
     opens Graphics to javafx.fxml;
