@@ -8,13 +8,36 @@ import java.util.List;
 
 public class MissaoDAO {
 
-    public List<Missao> listarDisponiveis(int nivelJogador) throws SQLException {
+    public List<Missao> listarDisponiveis(int nivelJogador, int personagemId) throws SQLException {
         List<Missao> lista = new ArrayList<>();
-        String sql = "SELECT * FROM missao WHERE nivel_minimo <= ? ORDER BY nivel_minimo";
+        String sql = """
+            SELECT m.*,
+                   COALESCE(pm.progresso_atual, 0) AS progresso_atual,
+                   COALESCE(pm.sala_atual,      0) AS sala_atual,
+                   COALESCE(pm.concluida,   false) AS concluida,
+                   COALESCE(pm.vezes_retornou, 0)  AS vezes_retornou,
+                   COALESCE(pm.fugiu,       false)  AS fugiu
+            FROM missao m
+            LEFT JOIN progresso_missao pm
+              ON m.id = pm.missao_id AND pm.personagem_id = ?
+            WHERE m.nivel_minimo <= ?
+            ORDER BY m.nivel_minimo
+            """;
         try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(sql)) {
-            ps.setInt(1, nivelJogador);
+            ps.setInt(1, personagemId);
+            ps.setInt(2, nivelJogador + 2);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) lista.add(mapear(rs));
+                while (rs.next()) {
+                    Missao m = mapear(rs);
+                    m.setProgressoAtual(rs.getInt("progresso_atual"));
+                    m.setSalaAtual(rs.getInt("sala_atual"));
+                    m.setConcluida(rs.getBoolean("concluida"));
+                    m.setVezesRetornou(rs.getInt("vezes_retornou"));
+                    m.setFugiu(rs.getBoolean("fugiu"));
+                    lista.add(m);
+                    m.restaurarPaginasDoProgresso();
+                    lista.add(m);
+                }
             }
         }
         return lista;
@@ -26,6 +49,38 @@ public class MissaoDAO {
         try (Statement st = ConexaoDB.getConexao().createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) lista.add(mapear(rs));
+        }
+        return lista;
+    }
+
+    public List<Missao> listarTodas(int personagemId) throws SQLException {
+        List<Missao> lista = new ArrayList<>();
+        String sql = """
+            SELECT m.*,
+                   COALESCE(pm.progresso_atual, 0) AS progresso_atual,
+                   COALESCE(pm.sala_atual,      0) AS sala_atual,
+                   COALESCE(pm.concluida,   false) AS concluida,
+                   COALESCE(pm.vezes_retornou, 0)  AS vezes_retornou,
+                   COALESCE(pm.fugiu,       false)  AS fugiu
+            FROM missao m
+            LEFT JOIN progresso_missao pm
+              ON m.id = pm.missao_id AND pm.personagem_id = ?
+            ORDER BY m.nivel_minimo
+            """;
+        try (PreparedStatement ps = ConexaoDB.getConexao().prepareStatement(sql)) {
+            ps.setInt(1, personagemId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Missao m = mapear(rs);
+                    m.setProgressoAtual(rs.getInt("progresso_atual"));
+                    m.setSalaAtual(rs.getInt("sala_atual"));
+                    m.setConcluida(rs.getBoolean("concluida"));
+                    m.setVezesRetornou(rs.getInt("vezes_retornou"));
+                    m.setFugiu(rs.getBoolean("fugiu"));
+                    m.restaurarPaginasDoProgresso();
+                    lista.add(m);
+                }
+            }
         }
         return lista;
     }
@@ -50,6 +105,7 @@ public class MissaoDAO {
                     m.setConcluida(rs.getBoolean("concluida"));
                     m.setVezesRetornou(rs.getInt("vezes_retornou"));
                     m.setFugiu(rs.getBoolean("fugiu"));
+                    m.restaurarPaginasDoProgresso();
                     return m;
                 }
             }

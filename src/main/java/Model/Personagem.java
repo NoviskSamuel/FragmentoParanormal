@@ -24,12 +24,12 @@ public class Personagem {
     private int moedas;
 
     public static final int STAMINA_MAXIMA_PADRAO    = 100;
-    public static final int CUSTO_STAMINA_INVESTIGAR = 10;
-    public static final int CUSTO_STAMINA_AVANCAR    = 5;
-    public static final int CUSTO_STAMINA_ATACAR     = 8;
-    public static final int CUSTO_STAMINA_RITUAL     = 12;
-    public static final int CUSTO_STAMINA_FUGIR      = 5;
-    public static final int SEGUNDOS_POR_PONTO_REGEN = 30;
+    public static final int CUSTO_STAMINA_INVESTIGAR = 5;
+    public static final int CUSTO_STAMINA_AVANCAR    = 2;
+    public static final int CUSTO_STAMINA_ATACAR     = 4;
+    public static final int CUSTO_STAMINA_RITUAL     = 6;
+    public static final int CUSTO_STAMINA_FUGIR      = 3;
+    public static final int SEGUNDOS_POR_PONTO_REGEN = 15;
 
     private int staminaMaxima = STAMINA_MAXIMA_PADRAO;
     private int staminaAtual  = STAMINA_MAXIMA_PADRAO;
@@ -96,36 +96,37 @@ public class Personagem {
         return ganharXP(xp, this.nivel);
     }
 
-    public boolean ganharXP(int xpBase, int nivelFonte) {
-        if (xpBase <= 0) return false;
+   public boolean ganharXP(int xpBase, int nivelFonte) {
+    if (xpBase <= 0) return false;
 
-        int diff = this.nivel - nivelFonte;
-        double fator;
-        if (diff <= 0) {
-            fator = 1.0;
-        } else if (diff == 1) {
-            fator = 0.6;
-        } else if (diff == 2) {
-            fator = 0.3;
-        } else if (diff == 3) {
-            fator = 0.1;
-        } else {
-            fator = 0.0;
-        }
-
-        int xpFinal = (int) Math.round(xpBase * fator);
-        if (xpFinal <= 0) return false;
-
-        this.xpAtual += xpFinal;
-        boolean subiu = false;
-        while (this.xpProximoNivel > 0 && this.xpAtual >= this.xpProximoNivel) {
-            this.xpAtual -= this.xpProximoNivel;
-            this.nivel++;
-            this.xpProximoNivel = (int) (this.xpProximoNivel * 1.5);
-            subiu = true;
-        }
-        return subiu;
+    int diff = this.nivel - nivelFonte;
+    double fator;
+    if (diff <= 0) {
+        fator = 1.0;
+    } else if (diff == 1) {
+        fator = 0.6;
+    } else if (diff == 2) {
+        fator = 0.3;
+    } else if (diff == 3) {
+        fator = 0.1;
+    } else {
+        fator = 0.0;
     }
+
+    int xpFinal = (int) Math.round(xpBase * fator);
+    if (xpFinal <= 0) return false;
+
+    this.xpAtual += xpFinal;
+    boolean subiu = false;
+    while (this.xpProximoNivel > 0 && this.xpAtual >= this.xpProximoNivel) {
+        this.xpAtual -= this.xpProximoNivel;
+        this.nivel++;
+        // Mudança: fator 1.2 em vez de 1.5 — curva muito mais suave
+        this.xpProximoNivel = (int) (this.xpProximoNivel * 1.2);
+        subiu = true;
+    }
+    return subiu;
+}
 
     public void subirAtributo(String atributo, int pontos) {
         if (pontos <= 0) return;
@@ -134,10 +135,10 @@ public class Personagem {
         else if (a.equals("poder"))        this.poderParanormal += pontos;
         else if (a.equals("investigacao")) this.investigacao     += pontos;
         else if (a.equals("vida")) {
-            int bonus = pontos * 5;
-            this.vidaMaxima += bonus;
-            this.vidaAtual  = Math.min(vidaAtual + bonus, vidaMaxima);
-        }
+    int bonus = pontos * 5;
+    this.vidaMaxima += bonus;
+    this.vidaAtual = Math.min(this.vidaAtual, this.vidaMaxima);
+}
     }
 
     public void restaurarVidaTotal() {

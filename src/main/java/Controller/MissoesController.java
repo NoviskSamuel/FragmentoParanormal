@@ -22,10 +22,11 @@ public class MissoesController {
     @FXML private Button btnConfirmar;
 
     private List<Missao> missoes;
-    private final Personagem jogador = ScreenManager.getInstance().getPersonagemAtivo();
+    private Personagem jogador;
 
     @FXML
     public void initialize() {
+        jogador = ScreenManager.getInstance().getPersonagemAtivo();
         carregarMissoes();
         listaMissoes.getSelectionModel().selectedIndexProperty()
             .addListener((obs, o, n) -> {
@@ -36,11 +37,13 @@ public class MissoesController {
 
     private void carregarMissoes() {
         try {
-            int nivel = jogador != null ? jogador.getNivel() : 1;
-            missoes = new MissaoDAO().listarDisponiveis(nivel);
+            int nivel        = jogador != null ? jogador.getNivel() : 1;
+            int personagemId = jogador != null ? jogador.getId()    : 0;
+            missoes = new MissaoDAO().listarTodas(personagemId);
             listaMissoes.getItems().clear();
             for (Missao m : missoes) {
-                String tag = m.isConcluida() ? " ✓" : "";
+                boolean bloqueada = m.getNivelMinimo() > nivel;
+                String tag = m.isConcluida() ? " ✓" : bloqueada ? " 🔒 (Nv." + m.getNivelMinimo() + ")" : "";
                 listaMissoes.getItems().add(m.getTitulo() + tag);
             }
             if (!missoes.isEmpty()) listaMissoes.getSelectionModel().selectFirst();
@@ -66,21 +69,21 @@ public class MissoesController {
             return;
         }
         Missao escolhida = missoes.get(idx);
-        if (jogador != null && jogador.getNivel() < escolhida.getNivelMinimo()) {
-            labelErro.setText("Nível insuficiente! Esta missão exige nível " + escolhida.getNivelMinimo() + ".");
+        int nivelAtual = jogador != null ? jogador.getNivel() : 1;
+        if (escolhida.getNivelMinimo() > nivelAtual) {
+            labelErro.setText("🔒 Missão bloqueada! Exige nível " + escolhida.getNivelMinimo() + ".");
             return;
         }
-
-        try {
-            if (jogador != null) {
-                Missao comProgresso = new MissaoDAO().carregarProgresso(jogador.getId(), escolhida.getId());
-                if (comProgresso != null) escolhida = comProgresso;
-            }
-        } catch (SQLException ignored) {}
-
+        if (escolhida.isConcluida()) {
+            labelErro.setText("Missão já concluída! Você não pode refazê-la.");
+            return;
+        }
         ScreenManager.getInstance().setMissaoAtiva(escolhida);
         ScreenManager.getInstance().ir(ScreenManager.TELA_MISSAO);
     }
 
-    @FXML private void onSair() { ScreenManager.getInstance().irSemHistorico(ScreenManager.TELA_INICIAL); }
+    @FXML
+    private void onSair() {
+        ScreenManager.getInstance().irSemHistorico(ScreenManager.TELA_INICIAL);
+    }
 }

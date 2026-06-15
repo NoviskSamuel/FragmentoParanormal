@@ -121,10 +121,31 @@ public class MissaoController {
         jogador.regenerarStamina();
         labelTitulo.setText(missao.getTitulo());
         labelObjetivo.setText("Objetivo: " + missao.getObjetivo() + " — " + missao.getProgressoTexto());
-        labelSala.setText("Sala " + missao.getSalaAtual() + " / " + missao.getTotalSalas());
+
+        // Mostra nome do local atual se disponível
+        Missao.LocalMapa local = missao.getLocalAtualObj();
+        if (local != null) {
+            labelSala.setText("📍 " + local.getNome()
+                    + (local.isPaginaEncontrada() ? " ✓" : "")
+                    + "  [" + (missao.getLocalAtual() + 1) + "/" + missao.getLocais().size() + "]");
+        } else {
+            labelSala.setText("Sala " + missao.getSalaAtual() + " / " + missao.getTotalSalas());
+        }
+
         labelVida.setText("❤ " + jogador.getVidaAtual() + " / " + jogador.getVidaMaxima());
         labelFragmento.setText("📜 Fragmentos: " + missao.getProgressoTexto());
         labelStamina.setText("⚡ " + jogador.getStaminaAtual() + " / " + jogador.getStaminaMaxima());
+    }
+
+    private void atualizarInfoLocal() {
+        Missao.LocalMapa local = missao.getLocalAtualObj();
+        if (local == null) return;
+        atualizarHUD();
+        if (!local.isPaginaEncontrada() && !local.isBossRoom()) {
+            labelNarrative.setText("📍 " + local.getNome()
+                    + "\n" + local.getDescricao()
+                    + "\n\n🔍 Investigue este local para encontrar a página do diário.");
+        }
     }
 
     private void atualizarBotaoVoltar() {
@@ -226,13 +247,10 @@ public class MissaoController {
             labelNarrative.setText("Você recuou para a sala anterior.");
         }
     }
-
-    // ── INVESTIGAR ────────────────────────────────────────────────
     @FXML
     private void onInvestigar() {
         if (!verificarCooldown()) return;
 
-        // Bloqueia investigação repetida na mesma sala
         if (missao.salaJaFoiInvestigada(missao.getSalaAtual())) {
             labelNarrative.setText("🔍 Você já vasculhou esta sala completamente.");
             return;
@@ -240,12 +258,66 @@ public class MissaoController {
 
         if (!exigirStamina(Personagem.CUSTO_STAMINA_INVESTIGAR)) return;
         iniciarCooldown();
-        missao.marcarSalaInvestigada(missao.getSalaAtual());
-        realizarInvestigacao();
+        // Marca DEPOIS de investigar — só bloqueia se realmente encontrou algo
+        realizarInvestigacaoComMarca();
+    }
+
+    private void realizarInvestigacaoComMarca() {
+        // Chance base de achar fragmento: 40-65% dependendo de investigação
+        int chanceFragmento = Math.min(65, 40 + jogador.getInvestigacao() / 2);
+        int roll = RAND.nextInt(100);
+
+        if (roll < chanceFragmento) {
+            // Achou a página — marca o local e bloqueia investigação
+            missao.marcarPaginaEncontrada();
+            missao.marcarSalaInvestigada(missao.getSalaAtual());
+
+            Item pagina = new Item("Fragmento do Diário", "FRAGMENTO", 0,
+                    "Página " + (missao.getProgressoAtual()) + " — " + getNomePaginaAtual());
+            jogador.getInventario().adicionarItem(pagina);
+
+            atualizarHUD();
+            atualizarInfoLocal();
+            labelItemEncontrado.setText("📜 Página encontrada!");
+            labelItemDesc.setText(pagina.getDescricao()
+                    + "\n\n" + missao.getProgressoTexto() + " páginas coletadas.");
+            painelItem.setVisible(true);
+            painelItem.setManaged(true);
+            verificarConclusao();
+
+        } else if (roll < chanceFragmento + 25) {
+            // Achou item secundário (poção/arma) — pode continuar investigando
+            Item item = gerarItemSecundario();
+            jogador.getInventario().adicionarItem(item);
+            labelItemEncontrado.setText("🔍 Encontrou: " + item.getNome());
+            labelItemDesc.setText(item.getDescricao());
+            painelItem.setVisible(true);
+            painelItem.setManaged(true);
+            if (item.isPocao()) {
+                jogador.curar(item.getValor());
+                atualizarHUD();
+                labelItemDesc.setText(item.getDescricao() + "\n✅ Vida restaurada! +" + item.getValor());
+            }
+        } else {
+            // Não achou nada — pode tentar de novo
+            labelNarrative.setText("Você vasculhou cuidadosamente, mas não encontrou a página. Tente novamente.");
+        }
+    }
+
+    private String getNomePaginaAtual() {
+        Missao.LocalMapa local = missao.getLocalAtualObj();
+        return local != null ? local.getNome() : "Local Desconhecido";
+    }
+
+    private Item gerarItemSecundario() {
+        int r = RAND.nextInt(100);
+        if (r < 50) return new Item("Poção de Ervas",   "POCAO", 30, "Restaura 30 pontos de vida.");
+        if (r < 75) return new Item("Faca Enferrujada", "ARMA",   8, "Uma faca velha mas ainda cortante.");
+        return          new Item("Amuleto Sombrio",   "RITUAL",  12, "Amplifica rituais paranormais.");
     }
 
     private void realizarInvestigacao() {
-        int chance = Math.min(75, 20 + jogador.getInvestigacao() * 2);
+        int chance = Math.min(85, 30 + jogador.getInvestigacao() * 2);
         if (RAND.nextInt(100) < chance) {
             Item item = gerarItem();
             jogador.getInventario().adicionarItem(item);
@@ -265,7 +337,7 @@ public class MissaoController {
                 labelItemDesc.setText(item.getDescricao() + "\n✅ Vida restaurada! +" + item.getValor());
             }
         } else {
-            labelNarrative.setText("Você varreu a sala cuidadosamente, mas não encontrou nada.");
+            labelNarrative.setText("Algo chamou sua atenção, mas não havia nada de útil.");
         }
     }
 
@@ -320,10 +392,11 @@ public class MissaoController {
         if (batalhaAtual == null || !batalhaAtual.isEmAndamento()) return;
 
         int custoStamina = switch (acao) {
-            case ATACAR, EQUIPAR_ARMA -> Personagem.CUSTO_STAMINA_ATACAR;
-            case USAR_RITUAL          -> Personagem.CUSTO_STAMINA_RITUAL;
-            case FUGIR                -> Personagem.CUSTO_STAMINA_FUGIR;
-        };
+    case ATACAR, EQUIPAR_ARMA -> Personagem.CUSTO_STAMINA_ATACAR;
+    case USAR_RITUAL          -> Personagem.CUSTO_STAMINA_RITUAL;
+    case FUGIR                -> Personagem.CUSTO_STAMINA_FUGIR;
+};
+if (!exigirStamina(custoStamina)) return;
         if (!exigirStamina(custoStamina)) return;
         iniciarCooldown();
 
@@ -395,13 +468,15 @@ public class MissaoController {
             salvarProgresso();
 
         } else if (batalhaAtual.jogadorMorreu()) {
-            SpriteManager.getInstance().animarMorte(imgPersonagem, () -> {
-                missao.setProgressoAtual(0);
-                missao.setSalaAtual(0);
-                missao.setFugiu(false);
-                missao.setVezesRetornou(0);
-                salvarProgresso();
-                salvarPersonagem();
+    SpriteManager.getInstance().animarMorte(imgPersonagem, () -> {
+        missao.setProgressoAtual(0);
+        missao.setSalaAtual(0);
+        missao.setFugiu(false);
+        missao.setVezesRetornou(0);
+        jogador.restaurarVidaTotal();
+        jogador.restaurarStaminaTotal();
+        salvarProgresso();
+        salvarPersonagem();
                 ScreenManager.getInstance().limparEstadoMissao();
                 try {
                     new RankingDAO().registrarPartida(
@@ -412,11 +487,13 @@ public class MissaoController {
                 p.play();
             });
 
-        } else if (batalhaAtual.jogadorFugiu()) {
-            imgInimigo.setVisible(false);
-            setBatalhaVisivel(false);
-            labelNarrative.setText("Você fugiu da batalha!");
-        }
+       } else if (batalhaAtual.jogadorFugiu()) {
+    imgInimigo.setVisible(false);
+    setBatalhaVisivel(false);
+    jogador.recuperarStamina(Personagem.CUSTO_STAMINA_FUGIR / 2);
+    atualizarHUD();
+    labelNarrative.setText("Você fugiu da batalha!");
+}
     }
 
     private void gerarEvento() {
@@ -489,19 +566,22 @@ public class MissaoController {
 
     private Item gerarItem() {
         int r = RAND.nextInt(100);
-        if      (r < 35) return new Item("Fragmento do Diário", "FRAGMENTO", 0,  "Uma página rasgada do diário perdido.");
-        else if (r < 55) return new Item("Poção de Ervas",       "POCAO",    30, "Restaura 30 pontos de vida.");
-        else if (r < 70) return new Item("Faca Enferrujada",     "ARMA",      8, "Uma faca velha mas ainda cortante.");
+        if      (r < 4) return new Item("Fragmento do Diário", "FRAGMENTO", 0,  "Uma página rasgada do diário perdido.");
+        else if (r < 70) return new Item("Poção de Ervas",       "POCAO",    30, "Restaura 30 pontos de vida.");
+        else if (r < 85) return new Item("Faca Enferrujada",     "ARMA",      8, "Uma faca velha mas ainda cortante.");
         else              return new Item("Amuleto Sombrio",      "RITUAL",   12, "Amplifica rituais paranormais.");
     }
 
     private void verificarConclusao() {
         if (missao.objetivoConcluido()) {
+            if (missao.bossLiberado() && !missao.isConcluida()) {
+                labelNarrative.setText("🏆 Todas as páginas encontradas! O boss foi liberado — avance para o confronto final!");
+            }
             missao.setConcluida(true);
             salvarProgresso();
             ScreenManager.getInstance().limparEstadoMissao();
-            int xpRecompensa = 200 + missao.getNivelMinimo() * 80;
-            boolean subiuNivel = jogador.ganharXP(xpRecompensa, missao.getNivelMinimo());
+            int xpRecompensa = 300 + missao.getNivelMinimo() * 100;
+            boolean subiuNivel = jogador.ganharXP(xpRecompensa, jogador.getNivel());
             jogador.setMoedas(jogador.getMoedas() + moedasSessao);
             salvarPersonagem();
             try {

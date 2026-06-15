@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS progresso_missao (
     personagem_id    INTEGER NOT NULL REFERENCES personagem(id) ON DELETE CASCADE,
     missao_id        INTEGER NOT NULL REFERENCES missao(id)     ON DELETE CASCADE,
     progresso_atual  INTEGER NOT NULL DEFAULT 0,
-    sala_atual       INTEGER NOT NULL DEFAULT 1,
+    sala_atual       INTEGER NOT NULL DEFAULT 0,
     concluida        BOOLEAN NOT NULL DEFAULT FALSE,
     vezes_retornou   INTEGER NOT NULL DEFAULT 0,
     fugiu            BOOLEAN NOT NULL DEFAULT FALSE,
