@@ -8,54 +8,67 @@ import java.util.stream.Collectors;
 public class Inventario {
 
     private final List<Item> itens = new ArrayList<>();
-    private Item itemEquipado;
 
-    // Métodos para o Controller buscar listas específicas por Categoria/Tipo
-    public List<Item> getArmas() {
-        return getItensPorTipo("Arma");
+    private Item armaEquipada;
+    private Item ritualEquipado;
+    private Item habilidadeEquipada;
+    private final List<Item> artefatosEquipados = new ArrayList<>();
+
+    private static final int MAX_ARTEFATOS = 2;
+
+    public List<Item> getArmas()       { return getItensPorTipo("ARMA"); }
+    public List<Item> getHabilidades() { return getItensPorTipo("HABILIDADE"); }
+    public List<Item> getRituais()     { return getItensPorTipo("RITUAL"); }
+    public List<Item> getConsumiveis() { return getItensPorTipo("POCAO"); }
+    public List<Item> getArtefatos()   { return getItensPorTipo("ARTEFATO"); }
+
+    public Item       getArmaEquipada()      { return armaEquipada; }
+    public Item       getRitualEquipado()    { return ritualEquipado; }
+    public Item       getHabilidadeEquipada(){ return habilidadeEquipada; }
+    public List<Item> getArtefatosEquipados(){ return Collections.unmodifiableList(artefatosEquipados); }
+
+    public Item getItemEquipado() {
+        if (armaEquipada      != null) return armaEquipada;
+        if (ritualEquipado    != null) return ritualEquipado;
+        if (habilidadeEquipada != null) return habilidadeEquipada;
+        return null;
     }
 
-    public List<Item> getHabilidades() {
-        return getItensPorTipo("Habilidade");
-    }
+    public boolean equiparItem(Item item) {
+        if (item == null || !itens.contains(item)) return false;
 
-    public List<Item> getRituais() {
-        return getItensPorTipo("Ritual");
-    }
-
-    public List<Item> getConsumiveis() {
-        return getItensPorTipo("Consumivel");
-    }
-
-    public List<Item> getArtefatos() {
-        return getItensPorTipo("Artefato");
-    }
-
-    // Métodos para o Controller verificar os Equipados específicos
-    public Item getArmaEquipada() {
-        return (itemEquipado != null && itemEquipado.getTipo().equalsIgnoreCase("Arma")) ? itemEquipado : null;
-    }
-
-    public Item getRitualEquipado() {
-        return (itemEquipado != null && itemEquipado.getTipo().equalsIgnoreCase("Ritual")) ? itemEquipado : null;
-    }
-
-    public Item getHabilidadeEquipada() {
-        return (itemEquipado != null && itemEquipado.getTipo().equalsIgnoreCase("Habilidade")) ? itemEquipado : null;
-    }
-
-    // O Controller espera uma lista de artefatos equipados, adaptamos usando o item atual se for artefato
-    public List<Item> getArtefatosEquipados() {
-        List<Item> equipados = new ArrayList<>();
-        if (itemEquipado != null && itemEquipado.getTipo().equalsIgnoreCase("Artefato")) {
-            equipados.add(itemEquipado);
+        String tipo = item.getTipo() == null ? "" : item.getTipo().toUpperCase();
+        switch (tipo) {
+            case "ARMA"       -> armaEquipada       = item;
+            case "RITUAL"     -> ritualEquipado      = item;
+            case "HABILIDADE" -> habilidadeEquipada  = item;
+            case "ARTEFATO"   -> {
+                if (!artefatosEquipados.contains(item)) {
+                    if (artefatosEquipados.size() >= MAX_ARTEFATOS) {
+                        artefatosEquipados.remove(0);
+                    }
+                    artefatosEquipados.add(item);
+                }
+            }
+            default -> { return false; }
         }
-        return equipados;
+        return true;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Seus métodos originais mantidos intactos abaixo:
-    // ─────────────────────────────────────────────────────────────
+    public boolean estaEquipado(Item item) {
+        if (item == null) return false;
+        return item.equals(armaEquipada)
+            || item.equals(ritualEquipado)
+            || item.equals(habilidadeEquipada)
+            || artefatosEquipados.contains(item);
+    }
+
+    public void desequipar() {
+        armaEquipada       = null;
+        ritualEquipado     = null;
+        habilidadeEquipada = null;
+        artefatosEquipados.clear();
+    }
 
     public void adicionarItem(Item item) {
         if (item != null) itens.add(item);
@@ -63,24 +76,12 @@ public class Inventario {
 
     public void removerItem(Item item) {
         itens.remove(item);
-        if (item != null && item.equals(itemEquipado)) {
-            itemEquipado = null;
-        }
+        if (item == null) return;
+        if (item.equals(armaEquipada))       armaEquipada       = null;
+        if (item.equals(ritualEquipado))     ritualEquipado     = null;
+        if (item.equals(habilidadeEquipada)) habilidadeEquipada = null;
+        artefatosEquipados.remove(item);
     }
-
-    public boolean equiparItem(Item item) {
-        if (item != null && itens.contains(item)) {
-            itemEquipado = item;
-            return true;
-        }
-        return false;
-    }
-
-    public void desequipar() {
-        itemEquipado = null;
-    }
-
-    public Item getItemEquipado() { return itemEquipado; }
 
     public List<Item> getItens() {
         return Collections.unmodifiableList(itens);
@@ -93,9 +94,7 @@ public class Inventario {
     }
 
     public int contarFragmentos() {
-        return (int) itens.stream()
-                .filter(Item::isFragmento)
-                .count();
+        return (int) itens.stream().filter(Item::isFragmento).count();
     }
 
     public boolean temItem(String nome) {
@@ -104,7 +103,7 @@ public class Inventario {
 
     public void limpar() {
         itens.clear();
-        itemEquipado = null;
+        desequipar();
     }
 
     public int tamanho() { return itens.size(); }

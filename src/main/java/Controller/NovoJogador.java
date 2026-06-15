@@ -15,19 +15,20 @@ import java.sql.SQLException;
 
 public class NovoJogador {
 
-    @FXML private TextField   campNome;
-    @FXML private ToggleGroup grupoClasse;
-    @FXML private RadioButton rbEspecialista;
-    @FXML private RadioButton rbCombatente;
-    @FXML private RadioButton rbOcultista;
-    @FXML private ToggleGroup grupoGenero;
-    @FXML private RadioButton rbMasculino;
-    @FXML private RadioButton rbFeminino;
+    @FXML private TextField    campNome;
+    @FXML private ToggleGroup  grupoClasse;
+    @FXML private RadioButton  rbEspecialista;
+    @FXML private RadioButton  rbCombatente;
+    @FXML private RadioButton  rbOcultista;
+    @FXML private ToggleGroup  grupoGenero;
+    @FXML private RadioButton  rbMasculino;
+    @FXML private RadioButton  rbFeminino;
     @FXML private ComboBox<String> comboElemento;
-    @FXML private ImageView   imgPreview;
-    @FXML private Label       labelDescClasse;
-    @FXML private Label       labelNomePersonagem;
-    @FXML private Label       labelErro;
+    @FXML private ImageView    imgPreview;
+    @FXML private Label        labelDescClasse;
+    @FXML private Label        labelNomePersonagem;
+    @FXML private Label        labelClassePreview;
+    @FXML private Label        labelErro;
 
     @FXML
     public void initialize() {
@@ -94,6 +95,7 @@ public class NovoJogador {
             case OCULTISTA    -> g == Genero.MASCULINO ? "Dante"   : "Agatha";
         };
         labelNomePersonagem.setText(nomePersonagem);
+        if (labelClassePreview != null) labelClassePreview.setText(c.getNome());
     }
 
     private Classe classeEscolhida() {
@@ -111,9 +113,11 @@ public class NovoJogador {
 
     private Elemento elementoEscolhido() {
         String nome = comboElemento.getValue();
+        if (nome == null) return Elemento.SANGUE;
         for (Elemento e : Elemento.values()) {
             if (e.getNome().equals(nome)) return e;
         }
-        return Elemento.valueOf(nome.toUpperCase());
+        try { return Elemento.valueOf(nome.toUpperCase()); }
+        catch (IllegalArgumentException ex) { return Elemento.SANGUE; }
     }
 }

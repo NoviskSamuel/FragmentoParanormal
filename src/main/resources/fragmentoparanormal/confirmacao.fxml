@@ -8,11 +8,11 @@
 
     <ImageView fitWidth="120" fitHeight="120" opacity="0.10" mouseTransparent="true"
                StackPane.alignment="TOP_LEFT" translateX="20" translateY="20">
-        <image><Image url="@../images/elementos/morte.png" backgroundLoading="true"/></image>
+        <image><Image url="@images/elementos/morte.png" backgroundLoading="true"/></image>
     </ImageView>
     <ImageView fitWidth="120" fitHeight="120" opacity="0.10" mouseTransparent="true"
                StackPane.alignment="BOTTOM_RIGHT" translateX="-20" translateY="-20">
-        <image><Image url="@../images/elementos/sangue.png" backgroundLoading="true"/></image>
+        <image><Image url="@images/elementos/sangue.png" backgroundLoading="true"/></image>
     </ImageView>
 
     <VBox alignment="CENTER" spacing="0">

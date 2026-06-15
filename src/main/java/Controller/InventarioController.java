@@ -81,12 +81,9 @@ public class InventarioController {
     }
 
     private void marcarAbaAtiva() {
-        btnAbaArmas.getStyleClass().remove("btn-aba-ativo");
-        btnAbaHabilidades.getStyleClass().remove("btn-aba-ativo");
-        btnAbaRituais.getStyleClass().remove("btn-aba-ativo");
-        btnAbaItens.getStyleClass().remove("btn-aba-ativo");
-        btnAbaArtefatos.getStyleClass().remove("btn-aba-ativo");
-
+        for (Button b : new Button[]{btnAbaArmas, btnAbaHabilidades, btnAbaRituais, btnAbaItens, btnAbaArtefatos}) {
+            b.getStyleClass().remove("btn-aba-ativo");
+        }
         Button ativo = switch (abaAtual) {
             case ARMAS       -> btnAbaArmas;
             case HABILIDADES -> btnAbaHabilidades;
@@ -133,31 +130,26 @@ public class InventarioController {
     }
 
     private String formatarNomeItem(Item item) {
-        boolean equipado = estaEquipado(item);
-        String prefixo = equipado ? "✓ " : "";
+        boolean equipado = jogador.getInventario().estaEquipado(item);
+        String prefixo = equipado ? "✓ " : "   ";
         String sufixo  = equipado ? "  (equipado)" : "";
         return prefixo + item.getNome() + sufixo;
-    }
-
-    private boolean estaEquipado(Item item) {
-        return item.equals(jogador.getInventario().getArmaEquipada())
-            || item.equals(jogador.getInventario().getRitualEquipado())
-            || item.equals(jogador.getInventario().getHabilidadeEquipada())
-            || jogador.getInventario().getArtefatosEquipados().contains(item);
     }
 
     private void exibirDetalhes(Item item) {
         labelNomeItem.setText(item.getNome());
         StringBuilder desc = new StringBuilder(item.getDescricao() != null ? item.getDescricao() : "");
         if (item.getValor() > 0) {
-            String rotuloValor = switch (item.getTipo().toUpperCase()) {
-                case "ARMA"  -> "\nDano: +" + item.getValor();
-                case "POCAO" -> "\nRecupera: " + item.getValor();
-                default      -> "\nValor: " + item.getValor();
+            String rotulo = switch (item.getTipo() != null ? item.getTipo().toUpperCase() : "") {
+                case "ARMA"       -> "\nDano bônus: +" + item.getValor();
+                case "POCAO"      -> "\nRecupera: "    + item.getValor() + " HP";
+                case "RITUAL"     -> "\nPoder: "       + item.getValor();
+                case "HABILIDADE" -> "\nCusto PE: "    + item.getValor();
+                default           -> "\nValor: "       + item.getValor();
             };
-            desc.append(rotuloValor);
+            desc.append(rotulo);
         }
-        if (estaEquipado(item)) {
+        if (jogador.getInventario().estaEquipado(item)) {
             desc.append("\n✓ Equipado");
         }
         labelDescItem.setText(desc.toString());
@@ -181,7 +173,7 @@ public class InventarioController {
             listaItens.getSelectionModel().select(i);
             atualizarPainelStatus();
         } else {
-            labelDescItem.setText("Este item não pode ser equipado.");
+            labelDescItem.setText("Este item não pode ser equipado nesta aba.");
         }
     }
 
@@ -197,7 +189,7 @@ public class InventarioController {
             carregarLista();
             limparDetalhes();
             atualizarPainelStatus();
-            labelDescItem.setText("✓ Poção usada. Vida restaurada!");
+            labelDescItem.setText("✓ Poção usada. +" + sel.getValor() + " HP!");
         } else {
             labelDescItem.setText("Este item não é consumível.");
         }
@@ -212,22 +204,22 @@ public class InventarioController {
         labelVidaPersonagem.setText("❤ " + jogador.getVidaAtual() + " / " + jogador.getVidaMaxima());
         labelStaminaPersonagem.setText("⚡ " + jogador.getStaminaAtual() + " / " + jogador.getStaminaMaxima());
 
-        Item arma   = jogador.getInventario().getArmaEquipada();
-        Item ritual = jogador.getInventario().getRitualEquipado();
-        Item hab    = jogador.getInventario().getHabilidadeEquipada();
-        List<Item> artefatos = jogador.getInventario().getArtefatosEquipados();
+        Item arma      = jogador.getInventario().getArmaEquipada();
+        Item ritual    = jogador.getInventario().getRitualEquipado();
+        Item hab       = jogador.getInventario().getHabilidadeEquipada();
+        List<Item> art = jogador.getInventario().getArtefatosEquipados();
 
-        labelArmaEquipada.setText("🗡 Arma: " + (arma != null ? arma.getNome() : "Nenhuma"));
-        labelRitualEquipado.setText("🜂 Ritual: " + (ritual != null ? ritual.getNome() : "Nenhum"));
-        labelHabilidadeEquipada.setText("✦ Habilidade: " + (hab != null ? hab.getNome() : "Nenhuma"));
+        labelArmaEquipada.setText("🗡 Arma: "         + (arma   != null ? arma.getNome()   : "Nenhuma"));
+        labelRitualEquipado.setText("🜂 Ritual: "      + (ritual != null ? ritual.getNome() : "Nenhum"));
+        labelHabilidadeEquipada.setText("✦ Habilidade: " + (hab  != null ? hab.getNome()   : "Nenhuma"));
 
-        if (artefatos.isEmpty()) {
+        if (art.isEmpty()) {
             labelArtefatos.setText("💎 Artefatos: Nenhum");
         } else {
             StringBuilder sb = new StringBuilder("💎 Artefatos: ");
-            for (int i = 0; i < artefatos.size(); i++) {
-                if (i > 0) sb.append(", ");
-                sb.append(artefatos.get(i).getNome());
+            for (int idx = 0; idx < art.size(); idx++) {
+                if (idx > 0) sb.append(", ");
+                sb.append(art.get(idx).getNome());
             }
             labelArtefatos.setText(sb.toString());
         }

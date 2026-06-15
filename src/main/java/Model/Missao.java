@@ -1,5 +1,8 @@
 package Model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Missao {
 
     private int     id;
@@ -14,6 +17,10 @@ public class Missao {
     private boolean concluida;
     private int     vezesRetornou;
     private boolean fugiu;
+
+    // Rastreia o estado de cada sala: inimigo derrotado e investigação realizada
+    private final Map<Integer, Boolean> salasComInimigoDerrotado  = new HashMap<>();
+    private final Map<Integer, Boolean> salasJaInvestigadas       = new HashMap<>();
 
     public Missao() {}
 
@@ -41,8 +48,17 @@ public class Missao {
         return salaAtual >= totalSalas;
     }
 
+    public boolean primeiraSala() {
+        return salaAtual <= 0;
+    }
+
     public int avancarSala() {
         salaAtual = Math.min(salaAtual + 1, totalSalas);
+        return salaAtual;
+    }
+
+    public int voltarSala() {
+        salaAtual = Math.max(0, salaAtual - 1);
         return salaAtual;
     }
 
@@ -55,6 +71,24 @@ public class Missao {
         return progressoAtual + "/" + totalObjetivo;
     }
 
+    // ── Estado por sala ───────────────────────────────────────────
+    public void marcarInimigoDerrotado(int sala) {
+        salasComInimigoDerrotado.put(sala, true);
+    }
+
+    public boolean salaTemInimigoDerrotado(int sala) {
+        return salasComInimigoDerrotado.getOrDefault(sala, false);
+    }
+
+    public void marcarSalaInvestigada(int sala) {
+        salasJaInvestigadas.put(sala, true);
+    }
+
+    public boolean salaJaFoiInvestigada(int sala) {
+        return salasJaInvestigadas.getOrDefault(sala, false);
+    }
+
+    // ── Getters / Setters ─────────────────────────────────────────
     public int     getId()                          { return id; }
     public void    setId(int id)                    { this.id = id; }
     public String  getTitulo()                      { return titulo; }

@@ -12,10 +12,10 @@ public class Batalha {
     private static final Random rand = new Random();
 
     public Batalha(Personagem jogador, Inimigo inimigo) {
-        this.jogador = jogador;
-        this.inimigo = inimigo;
+        this.jogador     = jogador;
+        this.inimigo     = inimigo;
         this.emAndamento = true;
-        this.fugiu = false;
+        this.fugiu       = false;
     }
 
     public String executarAcao(AcaoBatalha acao) {
@@ -25,36 +25,36 @@ public class Batalha {
 
         switch (acao) {
             case ATACAR -> {
-                int dano = calcularDanoJogador(false);
+                int dano = calcularDanoFisico();
                 inimigo.receberDano(dano);
                 log.append("Você atacou ").append(inimigo.getNome())
                    .append(" causando ").append(dano).append(" de dano!\n");
             }
             case USAR_RITUAL -> {
-                int dano = calcularDanoJogador(true);
+                int dano = calcularDanoParanormal();
                 inimigo.receberDano(dano);
                 log.append("Ritual executado! ").append(inimigo.getNome())
                    .append(" sofreu ").append(dano).append(" de dano paranormal!\n");
             }
             case EQUIPAR_ARMA -> {
-                Item arma = jogador.getInventario().getItemEquipado();
-                if (arma != null && arma.getTipo().equals("ARMA")) {
-                    int dano = jogador.getForca() + arma.getValor();
+                Item arma = jogador.getInventario().getArmaEquipada();
+                if (arma != null) {
+                    int dano = Math.max(1, jogador.getForca() + arma.getValor() + rand.nextInt(4));
                     inimigo.receberDano(dano);
                     log.append("Atacou com ").append(arma.getNome())
                        .append(" causando ").append(dano).append(" de dano!\n");
                 } else {
-                    log.append("Nenhuma arma equipada. Ataque com os punhos!\n");
-                    int dano = calcularDanoJogador(false);
+                    int dano = calcularDanoFisico();
                     inimigo.receberDano(dano);
+                    log.append("Nenhuma arma equipada. Ataque com os punhos!\n");
                     log.append("Causou ").append(dano).append(" de dano.\n");
                 }
             }
             case FUGIR -> {
-                boolean tentativaFuga = rand.nextInt(100) < 50;
-                if (tentativaFuga) {
+                boolean fugaOk = rand.nextInt(100) < 50;
+                if (fugaOk) {
                     emAndamento = false;
-                    this.fugiu = true;
+                    this.fugiu  = true;
                     this.ultimoLog = "Você fugiu com sucesso!";
                     return ultimoLog;
                 } else {
@@ -72,7 +72,7 @@ public class Batalha {
             return ultimoLog;
         }
 
-        int danoInimigo = Math.max(1, inimigo.getForca() - rand.nextInt(5));
+        int danoInimigo = Math.max(1, inimigo.getForca() - rand.nextInt(4));
         jogador.receberDano(danoInimigo);
         log.append(inimigo.getNome()).append(" contra-atacou causando ")
            .append(danoInimigo).append(" de dano!\n");
@@ -88,25 +88,20 @@ public class Batalha {
         return ultimoLog;
     }
 
-    private int calcularDanoJogador(boolean paranormal) {
-        int base = paranormal ? jogador.getPoderParanormal() : jogador.getForca();
-        return base + rand.nextInt(6);
-    }
+    private int calcularDanoFisico()     { return Math.max(1, jogador.getForca()           + rand.nextInt(6)); }
+    private int calcularDanoParanormal() { return Math.max(1, jogador.getPoderParanormal() + rand.nextInt(8)); }
 
     public Item rolarDrop(java.util.List<Item> pool) {
         if (pool == null || pool.isEmpty()) return null;
-        int chance = 40 + jogador.getInvestigacao();
-        if (rand.nextInt(100) < chance) {
-            return pool.get(rand.nextInt(pool.size()));
-        }
-        return null;
+        int chance = Math.min(55, 25 + jogador.getInvestigacao() / 2);
+        return rand.nextInt(100) < chance ? pool.get(rand.nextInt(pool.size())) : null;
     }
 
     public boolean isEmAndamento() { return emAndamento; }
-    public boolean jogadorVenceu() { return inimigo.estaMorto(); }
-    public boolean jogadorMorreu() { return jogador.estaMorto(); }
-    public boolean jogadorFugiu()  { return fugiu; }
-    public String getUltimoLog()   { return ultimoLog; }
+    public boolean jogadorVenceu() { return !emAndamento && inimigo.estaMorto(); }
+    public boolean jogadorMorreu() { return !emAndamento && jogador.estaMorto(); }
+    public boolean jogadorFugiu()  { return !emAndamento && fugiu; }
+    public String  getUltimoLog()  { return ultimoLog; }
     public Personagem getJogador() { return jogador; }
-    public Inimigo getInimigo()    { return inimigo; }
+    public Inimigo    getInimigo() { return inimigo; }
 }

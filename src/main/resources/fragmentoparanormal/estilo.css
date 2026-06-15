@@ -1,11 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════
-   FRAGMENTO PARANORMAL — CSS VISUAL COMPLETO
-   Tema: Horror Gótico / Paranormal Sombrio
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ── ROOT / FUNDO GERAL ──────────────────────────────────────── */
-.tela-fundo {
-    -fx-background-color: linear-gradient(to bottom, #0a0000 0%, #120008 40%, #080010 100%);
+.tela-fundo {    -fx-background-color: linear-gradient(to bottom, #0a0000 0%, #120008 40%, #080010 100%);
 }
 
 /* ── TIPOGRAFIA PRINCIPAL ────────────────────────────────────── */
@@ -649,13 +642,6 @@
     -fx-font-weight: bold;
 }
 
-/* ── LABEL CLASSE PREVIEW ────────────────────────────────────── */
-.label-classe {
-    -fx-text-fill: #bb7744;
-    -fx-font-family: "Georgia", serif;
-    -fx-font-size: 13px;
-    -fx-font-style: italic;
-}
 
 /* ── TOOLTIP ─────────────────────────────────────────────────── */
 .tooltip {

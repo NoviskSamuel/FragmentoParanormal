@@ -8,19 +8,19 @@
 
     <ImageView fitWidth="80" fitHeight="80" opacity="0.12" mouseTransparent="true"
                StackPane.alignment="TOP_LEFT" translateX="20" translateY="20">
-        <image><Image url="@../images/elementos/sangue.png" backgroundLoading="true"/></image>
+        <image><Image url="@images/elementos/sangue.png" backgroundLoading="true"/></image>
     </ImageView>
     <ImageView fitWidth="80" fitHeight="80" opacity="0.12" mouseTransparent="true"
                StackPane.alignment="TOP_RIGHT" translateX="-20" translateY="20">
-        <image><Image url="@../images/elementos/morte.png" backgroundLoading="true"/></image>
+        <image><Image url="@images/elementos/morte.png" backgroundLoading="true"/></image>
     </ImageView>
     <ImageView fitWidth="80" fitHeight="80" opacity="0.10" mouseTransparent="true"
                StackPane.alignment="BOTTOM_LEFT" translateX="20" translateY="-20">
-        <image><Image url="@../images/elementos/energia.webp" backgroundLoading="true"/></image>
+        <image><Image url="@images/elementos/energia.webp" backgroundLoading="true"/></image>
     </ImageView>
     <ImageView fitWidth="80" fitHeight="80" opacity="0.10" mouseTransparent="true"
                StackPane.alignment="BOTTOM_RIGHT" translateX="-20" translateY="-20">
-        <image><Image url="@../images/elementos/conhecimento.webp" backgroundLoading="true"/></image>
+        <image><Image url="@images/elementos/conhecimento.webp" backgroundLoading="true"/></image>
     </ImageView>
 
     <VBox alignment="CENTER" spacing="16" style="-fx-padding: 30;">

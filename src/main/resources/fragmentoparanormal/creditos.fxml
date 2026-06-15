@@ -1,59 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
-<StackPane xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="Controller.CreditosController"
-           styleClass="tela-fundo" prefWidth="960" prefHeight="640">
 
-    <ImageView fitWidth="90" fitHeight="90" opacity="0.12" mouseTransparent="true"
-               StackPane.alignment="TOP_LEFT" translateX="24" translateY="24">
-        <image><Image url="@../images/elementos/sangue.png" backgroundLoading="true"/></image>
-    </ImageView>
-    <ImageView fitWidth="90" fitHeight="90" opacity="0.12" mouseTransparent="true"
-               StackPane.alignment="TOP_RIGHT" translateX="-24" translateY="24">
-        <image><Image url="@../images/elementos/morte.png" backgroundLoading="true"/></image>
-    </ImageView>
-    <ImageView fitWidth="90" fitHeight="90" opacity="0.10" mouseTransparent="true"
-               StackPane.alignment="BOTTOM_LEFT" translateX="24" translateY="-24">
-        <image><Image url="@../images/elementos/energia.webp" backgroundLoading="true"/></image>
-    </ImageView>
-    <ImageView fitWidth="90" fitHeight="90" opacity="0.10" mouseTransparent="true"
-               StackPane.alignment="BOTTOM_RIGHT" translateX="-24" translateY="-24">
-        <image><Image url="@../images/elementos/conhecimento.webp" backgroundLoading="true"/></image>
-    </ImageView>
-
-    <VBox alignment="CENTER" spacing="0">
-        <Label text="FRAGMENTO"  styleClass="titulo-principal"/>
-        <Label text="PARANORMAL" styleClass="titulo-principal"/>
-        <Label text="─────────────────────────────"
-               style="-fx-text-fill: #440000; -fx-font-size: 14px; -fx-padding: 2 0 20 0;"/>
-
-        <VBox styleClass="painel-formulario" alignment="CENTER" spacing="16"
-              style="-fx-max-width: 480px;">
-            <Label text="CRÉDITOS" styleClass="titulo-painel"/>
-
-            <Label text="DESENVOLVIDO POR" styleClass="label-credito-titulo"/>
-            <Label fx:id="labelCriadores" text="Samuel Novisk Silva"
-                   styleClass="label-credito" wrapText="true" textAlignment="CENTER"/>
-
-            <Label text="─────────────" style="-fx-text-fill: #330000; -fx-font-size: 12px;"/>
-
-            <Label text="HISTÓRIA E ROTEIRO" styleClass="label-credito-titulo"/>
-            <Label fx:id="labelArtista" text="Samuel Silva e Samuel Isaque Coinete Gomes" styleClass="label-credito"/>
-
-            <Label text="─────────────" style="-fx-text-fill: #330000; -fx-font-size: 12px;"/>
-
-            <Label text="TLP — Técnicas de Linguagem de Programação 2"
-                   style="-fx-text-fill: #664433; -fx-font-family: 'Georgia', serif;
-                          -fx-font-size: 12px; -fx-font-style: italic;"/>
-
-            <Button text="VOLTAR" onAction="#onVoltar" styleClass="btn-menu"
-                    style="-fx-padding: 16 0 0 0; -fx-min-width: 200px;"/>
-        </VBox>
-    </VBox>
-
-    <Label text="✦  FRAGMENTO PARANORMAL  ✦"
-           style="-fx-text-fill: #330000; -fx-font-size: 11px; -fx-font-family: 'Georgia', serif;"
-           StackPane.alignment="BOTTOM_CENTER" translateY="-12"/>
+<StackPane prefHeight="640" prefWidth="960" styleClass="tela-fundo" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="Controller.CreditosController">
+   <children>
+   
+       <ImageView fitHeight="90" fitWidth="90" mouseTransparent="true" opacity="0.12" translateX="24" translateY="24" StackPane.alignment="TOP_LEFT">
+           <image>
+            <Image backgroundLoading="true" url="@../images/elementos/sangue.png" />
+         </image>
+       </ImageView>
+       <ImageView fitHeight="90" fitWidth="90" mouseTransparent="true" opacity="0.12" translateX="-24" translateY="24" StackPane.alignment="TOP_RIGHT">
+           <image>
+            <Image backgroundLoading="true" url="@../images/elementos/morte.png" />
+         </image>
+       </ImageView>
+       <ImageView fitHeight="90" fitWidth="90" mouseTransparent="true" opacity="0.10" translateX="24" translateY="-24" StackPane.alignment="BOTTOM_LEFT">
+           <image>
+            <Image backgroundLoading="true" url="@../images/elementos/energia.webp" />
+         </image>
+       </ImageView>
+       <ImageView fitHeight="90" fitWidth="90" mouseTransparent="true" opacity="0.10" translateX="-24" translateY="-24" StackPane.alignment="BOTTOM_RIGHT">
+           <image>
+            <Image backgroundLoading="true" url="@../images/elementos/conhecimento.webp" />
+         </image>
+       </ImageView>
+   
+       <VBox alignment="CENTER" spacing="0">
+      <children>
+              <Label styleClass="titulo-principal" text="FRAGMENTO" />
+              <Label styleClass="titulo-principal" text="PARANORMAL" />
+              <Label style="-fx-text-fill: #440000; -fx-font-size: 14px; -fx-padding: 2 0 20 0;" text="─────────────────────────────" />
+      
+              <VBox alignment="CENTER" spacing="16" style="-fx-max-width: 480px;" styleClass="painel-formulario">
+         <children>
+                     <Label styleClass="titulo-painel" text="CRÉDITOS" />
+         
+                     <Label styleClass="label-credito-titulo" text="DESENVOLVIDO POR" />
+                     <Label fx:id="labelCriadores" styleClass="label-credito" text="Samuel 'Novisk' Silva" textAlignment="CENTER" wrapText="true" />
+         
+                     <Label style="-fx-text-fill: #330000; -fx-font-size: 12px;" text="─────────────" />
+         
+                     <Label styleClass="label-credito-titulo" text="HISTÓRIA E ROTEIRO" />
+                     <Label fx:id="labelArtista" styleClass="label-credito" text="Samuel Silva e Samuel Isaque Coinete Gomes" />
+         
+                     <Label style="-fx-text-fill: #330000; -fx-font-size: 12px;" text="─────────────" />
+         
+                     <Label style="-fx-text-fill: #664433; -fx-font-family: 'Georgia', serif;                           -fx-font-size: 12px; -fx-font-style: italic;" text="TLP — Técnicas de Linguagem de Programação 2" />
+         
+                     <Button onAction="#onVoltar" style="-fx-padding: 16 0 0 0; -fx-min-width: 200px;" styleClass="btn-menu" text="VOLTAR" />
+         </children>
+              </VBox>
+      </children>
+       </VBox>
+   
+       <Label style="-fx-text-fill: #330000; -fx-font-size: 11px; -fx-font-family: 'Georgia', serif;" text="✦  FRAGMENTO PARANORMAL  ✦" translateY="-12" StackPane.alignment="BOTTOM_CENTER" />
+   </children>
 </StackPane>

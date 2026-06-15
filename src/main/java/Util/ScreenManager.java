@@ -40,16 +40,16 @@ public class ScreenManager {
     private boolean estadoMissaoSalvo = false;
 
     public static final String TELA_INICIAL      = "primary";
-    public static final String TELA_JOGAR        = "jogar";
-    public static final String TELA_NOVO_JOGADOR = "novo_jogador";
+    public static final String TELA_JOGAR        = "jogar";        // Tela de escolha (Novo vs Existente)
+    public static final String TELA_NOVO_JOGADOR = "novo_jogador"; // Tela de criação
     public static final String TELA_CONFIRMACAO  = "confirmacao";
-    public static final String TELA_MISSOES      = "missoes";
-    public static final String TELA_MISSAO       = "missao";
+    public static final String TELA_MISSOES      = "missoes";      // Lista de missões (Jogador existente vai para cá)
+    public static final String TELA_MISSAO       = "missao";       // A tela do jogo/combate em si
     public static final String TELA_INVENTARIO   = "inventario";
     public static final String TELA_LEVEL_UP     = "level_up";
     public static final String TELA_RANKING      = "ranking";
     public static final String TELA_CREDITOS     = "creditos";
-    public static final String TELA_DESCANSO     = "descanso"; 
+    public static final String TELA_DESCANSO     = "descanso";
     
     public void init(Stage stage) throws IOException {
         this.stage = stage;
@@ -160,12 +160,43 @@ public class ScreenManager {
         this.estadoMissaoSalvo    = false;
     }
 
-    public Stage  getStage()                           { return stage; }
+    public Stage  getStage()
+    {
+        return stage; 
+    }
 
     public void limparSessao() {
         personagemAtivo = null;
         missaoAtiva     = null;
         historico.clear();
         limparEstadoMissao();
+    }
+    
+     public String getCaminhoCenarioAtual() {
+        Missao missaoAtiva = getMissaoAtiva();
+        if (missaoAtiva == null) {
+            return "/fragmentoparanormal/images/ui/placeholder.png"; 
+        }
+
+        int sala = missaoAtiva.getSalaAtual();
+        int totalSalas = missaoAtiva.getTotalSalas();
+
+        // Se o ID da missão for 1
+        if (missaoAtiva.getId() == 1) {
+            if (sala >= totalSalas) {
+                return "/Assets/Cenarios/Missao1_salaFinal.jpg";
+            }
+            
+            return switch (sala) {
+                case 0, 1 -> "/Assets/Cenarios/Missao1_sala1.jpg";
+                case 2    -> "/Assets/Cenarios/Missao1_sala2.jpg";
+                case 3    -> "/Assets/Cenarios/Missao1_sala3.jpg";
+                case 4    -> "/Assets/Cenarios/Missao1_sala4.jpg";
+                default   -> "/Assets/Cenarios/Missao1_sala4.jpg";
+            };
+        }
+
+        // Fallback genérico para outras missões que você criar depois
+        return "/fragmentoparanormal/images/ui/placeholder.png";
     }
 }

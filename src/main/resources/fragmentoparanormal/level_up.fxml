@@ -8,7 +8,7 @@
 
     <ImageView fitWidth="130" fitHeight="130" opacity="0.08" mouseTransparent="true"
                StackPane.alignment="CENTER">
-        <image><Image url="@../images/elementos/conhecimento.webp" backgroundLoading="true"/></image>
+        <image><Image url="@images/elementos/conhecimento.webp" backgroundLoading="true"/></image>
     </ImageView>
 
     <VBox alignment="CENTER" spacing="0">

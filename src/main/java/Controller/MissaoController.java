@@ -38,13 +38,17 @@ public class MissaoController {
     @FXML private ImageView imgPersonagem;
     @FXML private ImageView imgInimigo;
     @FXML private ImageView imgJumpscare;
+    @FXML private ImageView imgCenarioFundo;
 
     @FXML private HBox painelAcoesMissao;
     @FXML private HBox painelBatalha;
 
-    @FXML private VBox painelItem;
+    @FXML private VBox  painelItem;
     @FXML private Label labelItemEncontrado;
     @FXML private Label labelItemDesc;
+
+    // Botão voltar — referenciado para habilitar/desabilitar
+    @FXML private Button btnVoltar;
 
     private Personagem jogador;
     private Missao     missao;
@@ -71,6 +75,7 @@ public class MissaoController {
 
         setBatalhaVisivel(false);
         painelItem.setVisible(false);
+        painelItem.setManaged(false);
 
         if (ScreenManager.getInstance().temEstadoMissaoSalvo()) {
             restaurarEstadoMissao();
@@ -78,6 +83,9 @@ public class MissaoController {
             atualizarHUD();
             labelNarrative.setText("Você chegou ao local. Avance com cuidado, Agente " + jogador.getNome() + ".");
         }
+
+        atualizarBotaoVoltar();
+        atualizarCenario();
     }
 
     private void restaurarEstadoMissao() {
@@ -105,6 +113,8 @@ public class MissaoController {
         labelNarrative.setText(narrativa != null && !narrativa.isBlank()
             ? narrativa
             : "Você retornou à missão, Agente " + jogador.getNome() + ". Continue avançando.");
+
+        atualizarCenario();
     }
 
     private void atualizarHUD() {
@@ -115,6 +125,12 @@ public class MissaoController {
         labelVida.setText("❤ " + jogador.getVidaAtual() + " / " + jogador.getVidaMaxima());
         labelFragmento.setText("📜 Fragmentos: " + missao.getProgressoTexto());
         labelStamina.setText("⚡ " + jogador.getStaminaAtual() + " / " + jogador.getStaminaMaxima());
+    }
+
+    private void atualizarBotaoVoltar() {
+        if (btnVoltar != null) {
+            btnVoltar.setDisable(missao.primeiraSala());
+        }
     }
 
     private boolean verificarCooldown() {
@@ -161,6 +177,7 @@ public class MissaoController {
         return true;
     }
 
+    // ── AVANÇAR ───────────────────────────────────────────────────
     @FXML
     private void onAvancar() {
         if (!verificarCooldown()) return;
@@ -172,14 +189,58 @@ public class MissaoController {
         iniciarCooldown();
         missao.avancarSala();
         atualizarHUD();
-        gerarEvento();
+        atualizarBotaoVoltar();
+        atualizarCenario();
+
+        // Sala já visitada — não gera novo evento
+        if (missao.salaTemInimigoDerrotado(missao.getSalaAtual())) {
+            labelNarrative.setText("Você voltou a esta sala. Não há mais nada aqui além de silêncio.");
+        } else {
+            gerarEvento();
+        }
     }
 
+    // ── VOLTAR ────────────────────────────────────────────────────
+    @FXML
+    private void onVoltarSala() {
+        if (!verificarCooldown()) return;
+        if (missao.primeiraSala()) {
+            labelNarrative.setText("Você já está na primeira sala.");
+            return;
+        }
+        if (!exigirStamina(Personagem.CUSTO_STAMINA_AVANCAR)) return;
+        iniciarCooldown();
+        missao.voltarSala();
+        atualizarHUD();
+        atualizarBotaoVoltar();
+        atualizarCenario();
+
+        boolean inimigoMorto  = missao.salaTemInimigoDerrotado(missao.getSalaAtual());
+        boolean jaInvestigada = missao.salaJaFoiInvestigada(missao.getSalaAtual());
+
+        if (inimigoMorto && jaInvestigada) {
+            labelNarrative.setText("Você voltou a esta sala. Tudo já foi vasculhado — não há mais nada aqui.");
+        } else if (inimigoMorto) {
+            labelNarrative.setText("Você voltou a esta sala. O inimigo foi derrotado, mas ainda é possível investigar.");
+        } else {
+            labelNarrative.setText("Você recuou para a sala anterior.");
+        }
+    }
+
+    // ── INVESTIGAR ────────────────────────────────────────────────
     @FXML
     private void onInvestigar() {
         if (!verificarCooldown()) return;
+
+        // Bloqueia investigação repetida na mesma sala
+        if (missao.salaJaFoiInvestigada(missao.getSalaAtual())) {
+            labelNarrative.setText("🔍 Você já vasculhou esta sala completamente.");
+            return;
+        }
+
         if (!exigirStamina(Personagem.CUSTO_STAMINA_INVESTIGAR)) return;
         iniciarCooldown();
+        missao.marcarSalaInvestigada(missao.getSalaAtual());
         realizarInvestigacao();
     }
 
@@ -191,6 +252,7 @@ public class MissaoController {
             labelItemEncontrado.setText("🔍 Encontrou: " + item.getNome());
             labelItemDesc.setText(item.getDescricao());
             painelItem.setVisible(true);
+            painelItem.setManaged(true);
 
             if (item.isFragmento()) {
                 missao.incrementarProgresso();
@@ -207,8 +269,13 @@ public class MissaoController {
         }
     }
 
-    @FXML private void onFecharItem() { painelItem.setVisible(false); }
+    @FXML
+    private void onFecharItem() {
+        painelItem.setVisible(false);
+        painelItem.setManaged(false);
+    }
 
+    // ── FUGIR DA MISSÃO ───────────────────────────────────────────
     @FXML
     private void onFugirMissao() {
         if (!verificarCooldown()) return;
@@ -242,14 +309,11 @@ public class MissaoController {
         ScreenManager.getInstance().ir(ScreenManager.TELA_DESCANSO);
     }
 
+    // ── BATALHA ───────────────────────────────────────────────────
     @FXML private void onAtacar()      { executarBatalha(AcaoBatalha.ATACAR); }
     @FXML private void onRitual()      { executarBatalha(AcaoBatalha.USAR_RITUAL); }
     @FXML private void onEquiparArma() { executarBatalha(AcaoBatalha.EQUIPAR_ARMA); }
-
-    @FXML
-    private void onFugirBatalha() {
-        executarBatalha(AcaoBatalha.FUGIR);
-    }
+    @FXML private void onFugirBatalha(){ executarBatalha(AcaoBatalha.FUGIR); }
 
     private void executarBatalha(AcaoBatalha acao) {
         if (!verificarCooldown()) return;
@@ -271,7 +335,6 @@ public class MissaoController {
         if (batalhaAtual.getInimigo().getVidaAtual() < batalhaAtual.getInimigo().getVidaMaxima()) {
             SpriteManager.getInstance().animarDano(imgInimigo);
         }
-
         if (jogador.getVidaAtual() < jogador.getVidaMaxima()) {
             SpriteManager.getInstance().animarDano(imgPersonagem);
         }
@@ -286,12 +349,15 @@ public class MissaoController {
 
     private void processarFimDeBatalha() {
         if (batalhaAtual.jogadorVenceu()) {
+            // Marca a sala como "inimigo derrotado"
+            missao.marcarInimigoDerrotado(missao.getSalaAtual());
+
             inimigosMortos++;
             moedasSessao += batalhaAtual.getInimigo().getMoedasDrop();
 
-            int xpBase      = batalhaAtual.getInimigo().getXpConcedido();
+            int xpBase       = batalhaAtual.getInimigo().getXpConcedido();
             int nivelInimigo = batalhaAtual.getInimigo().getNivel();
-            boolean subiuNivelBatalha = jogador.ganharXP(xpBase, nivelInimigo);
+            boolean subiuNivel = jogador.ganharXP(xpBase, nivelInimigo);
 
             List<Item> pool = List.of(
                 new Item("Faca Enferrujada",    "ARMA",      8,  "Uma faca velha mas ainda cortante."),
@@ -305,10 +371,9 @@ public class MissaoController {
                 labelItemEncontrado.setText("🎁 Drop: " + drop.getNome());
                 labelItemDesc.setText(drop.getDescricao());
                 painelItem.setVisible(true);
-                if (drop.isFragmento()) {
-                    missao.incrementarProgresso();
-                }
-                if (drop.isPocao()) jogador.curar(drop.getValor());
+                painelItem.setManaged(true);
+                if (drop.isFragmento()) missao.incrementarProgresso();
+                if (drop.isPocao())     jogador.curar(drop.getValor());
             }
 
             SpriteManager.getInstance().animarMorte(imgInimigo, () -> {
@@ -318,11 +383,10 @@ public class MissaoController {
                 verificarConclusao();
                 if (!missao.objetivoConcluido()) {
                     String xpMsg = nivelInimigo < jogador.getNivel() - 3
-                        ? " (XP reduzido — inimigo muito fraco)"
-                        : "";
+                        ? " (XP reduzido — inimigo muito fraco)" : "";
                     labelNarrative.setText("Inimigo derrotado! Continue avançando." + xpMsg);
                 }
-                if (subiuNivelBatalha && !missao.objetivoConcluido()) {
+                if (subiuNivel && !missao.objetivoConcluido()) {
                     PauseTransition p = new PauseTransition(Duration.seconds(1));
                     p.setOnFinished(e -> ScreenManager.getInstance().ir(ScreenManager.TELA_LEVEL_UP));
                     p.play();
@@ -394,25 +458,25 @@ public class MissaoController {
 
     private void setBatalhaVisivel(boolean visivel) {
         painelBatalha.setVisible(visivel);
+        painelBatalha.setManaged(visivel);
         painelAcoesMissao.setVisible(!visivel);
+        painelAcoesMissao.setManaged(!visivel);
         labelVidaInimigo.setVisible(visivel);
     }
 
     private Inimigo gerarInimigo() {
         record Cfg(String nome, String img) {}
         List<Cfg> tipos = List.of(
-            new Cfg("Enraizado",      "enraizado.png"),
-            new Cfg("Zumbi de Sangue","zumbisangue.png"),
-            new Cfg("Existido",       "existido.png"),
-            new Cfg("Anárquico",      "anarquico.png")
+            new Cfg("Enraizado",       "enraizado.png"),
+            new Cfg("Zumbi de Sangue", "zumbisangue.png"),
+            new Cfg("Existido",        "existido.png"),
+            new Cfg("Anárquico",       "anarquico.png")
         );
         Cfg c   = tipos.get(RAND.nextInt(tipos.size()));
         int sal = Math.max(1, missao.getSalaAtual());
         Elemento[] elementos = {
-            Elemento.CONHECIMENTO,
-            Elemento.ENERGIA,
-            Elemento.MORTE,
-            Elemento.SANGUE
+            Elemento.CONHECIMENTO, Elemento.ENERGIA,
+            Elemento.MORTE,        Elemento.SANGUE
         };
         Elemento elementoAleatorio = elementos[RAND.nextInt(elementos.length)];
         int nivelInimigo = missao.getNivelMinimo() + (sal - 1);
@@ -425,9 +489,9 @@ public class MissaoController {
 
     private Item gerarItem() {
         int r = RAND.nextInt(100);
-        if (r < 35)      return new Item("Fragmento do Diário", "FRAGMENTO", 0,  "Uma página rasgada do diário perdido.");
+        if      (r < 35) return new Item("Fragmento do Diário", "FRAGMENTO", 0,  "Uma página rasgada do diário perdido.");
         else if (r < 55) return new Item("Poção de Ervas",       "POCAO",    30, "Restaura 30 pontos de vida.");
-        else if (r < 70) return new Item("Faca Enferrujada",     "ARMA",     8,  "Uma faca velha mas ainda cortante.");
+        else if (r < 70) return new Item("Faca Enferrujada",     "ARMA",      8, "Uma faca velha mas ainda cortante.");
         else              return new Item("Amuleto Sombrio",      "RITUAL",   12, "Amplifica rituais paranormais.");
     }
 
@@ -459,20 +523,41 @@ public class MissaoController {
         }
     }
 
-    private void salvarProgresso() {
-        if (jogador == null || missao == null) return;
+    private void atualizarCenario() {
+        if (imgCenarioFundo == null || missao == null) return;
         try {
-            new MissaoDAO().salvarProgresso(jogador.getId(), missao);
-        } catch (SQLException e) {
-            System.err.println("Erro ao salvar progresso: " + e.getMessage());
+            int salaAtual  = Math.max(1, missao.getSalaAtual());
+            int totalSalas = missao.getTotalSalas();
+            int idMissao   = missao.getId();
+
+            int cenarioId = idMissao;
+            if (idMissao == 4)      cenarioId = 2;
+            else if (idMissao >= 5) cenarioId = 1;
+
+            String nomeImagem;
+            if (salaAtual >= totalSalas) {
+                nomeImagem = "Missao" + cenarioId + "_salaFinal.jpg";
+            } else {
+                nomeImagem = "Missao" + cenarioId + "_sala" + Math.min(salaAtual, 4) + ".jpg";
+            }
+
+            var resource = getClass().getResource("/fragmentoparanormal/cenarios/" + nomeImagem);
+            if (resource != null) {
+                imgCenarioFundo.setImage(new javafx.scene.image.Image(resource.toExternalForm()));
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar cenário: " + e.getMessage());
         }
     }
 
+    private void salvarProgresso() {
+        if (jogador == null || missao == null) return;
+        try { new MissaoDAO().salvarProgresso(jogador.getId(), missao); }
+        catch (SQLException e) { System.err.println("Erro ao salvar progresso: " + e.getMessage()); }
+    }
+
     private void salvarPersonagem() {
-        try {
-            new PersonagemDAO().atualizar(jogador);
-        } catch (SQLException e) {
-            System.err.println("Erro ao salvar personagem: " + e.getMessage());
-        }
+        try { new PersonagemDAO().atualizar(jogador); }
+        catch (SQLException e) { System.err.println("Erro ao salvar personagem: " + e.getMessage()); }
     }
 }
