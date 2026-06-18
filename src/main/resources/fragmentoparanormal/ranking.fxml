@@ -43,6 +43,8 @@
         <Label fx:id="labelErro" styleClass="label-erro"/>
         <Button text="VOLTAR" onAction="#onVoltar" styleClass="btn-menu"
                 style="-fx-min-width: 200px;"/>
+        <Button text="📥 EXPORTAR CSV" onAction="#onExportar" styleClass="btn-acao"
+        style="-fx-min-width: 180px;"/>
     </VBox>
 
     <Label text="✦  FRAGMENTO PARANORMAL  ✦"

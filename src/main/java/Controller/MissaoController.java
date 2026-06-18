@@ -23,6 +23,12 @@ import javafx.util.Duration;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Random;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import java.io.IOException;
 
 public class MissaoController {
 
@@ -47,7 +53,6 @@ public class MissaoController {
     @FXML private Label labelItemEncontrado;
     @FXML private Label labelItemDesc;
 
-    // Botão voltar — referenciado para habilitar/desabilitar
     @FXML private Button btnVoltar;
 
     private Personagem jogador;
@@ -122,7 +127,6 @@ public class MissaoController {
         labelTitulo.setText(missao.getTitulo());
         labelObjetivo.setText("Objetivo: " + missao.getObjetivo() + " — " + missao.getProgressoTexto());
 
-        // Mostra nome do local atual se disponível
         Missao.LocalMapa local = missao.getLocalAtualObj();
         if (local != null) {
             labelSala.setText("📍 " + local.getNome()
@@ -198,7 +202,6 @@ public class MissaoController {
         return true;
     }
 
-    // ── AVANÇAR ───────────────────────────────────────────────────
     @FXML
     private void onAvancar() {
         if (!verificarCooldown()) return;
@@ -213,7 +216,6 @@ public class MissaoController {
         atualizarBotaoVoltar();
         atualizarCenario();
 
-        // Sala já visitada — não gera novo evento
         if (missao.salaTemInimigoDerrotado(missao.getSalaAtual())) {
             labelNarrative.setText("Você voltou a esta sala. Não há mais nada aqui além de silêncio.");
         } else {
@@ -221,7 +223,6 @@ public class MissaoController {
         }
     }
 
-    // ── VOLTAR ────────────────────────────────────────────────────
     @FXML
     private void onVoltarSala() {
         if (!verificarCooldown()) return;
@@ -247,6 +248,7 @@ public class MissaoController {
             labelNarrative.setText("Você recuou para a sala anterior.");
         }
     }
+
     @FXML
     private void onInvestigar() {
         if (!verificarCooldown()) return;
@@ -258,17 +260,14 @@ public class MissaoController {
 
         if (!exigirStamina(Personagem.CUSTO_STAMINA_INVESTIGAR)) return;
         iniciarCooldown();
-        // Marca DEPOIS de investigar — só bloqueia se realmente encontrou algo
         realizarInvestigacaoComMarca();
     }
 
     private void realizarInvestigacaoComMarca() {
-        // Chance base de achar fragmento: 40-65% dependendo de investigação
         int chanceFragmento = Math.min(65, 40 + jogador.getInvestigacao() / 2);
         int roll = RAND.nextInt(100);
 
         if (roll < chanceFragmento) {
-            // Achou a página — marca o local e bloqueia investigação
             missao.marcarPaginaEncontrada();
             missao.marcarSalaInvestigada(missao.getSalaAtual());
 
@@ -286,7 +285,6 @@ public class MissaoController {
             verificarConclusao();
 
         } else if (roll < chanceFragmento + 25) {
-            // Achou item secundário (poção/arma) — pode continuar investigando
             Item item = gerarItemSecundario();
             jogador.getInventario().adicionarItem(item);
             labelItemEncontrado.setText("🔍 Encontrou: " + item.getNome());
@@ -299,7 +297,6 @@ public class MissaoController {
                 labelItemDesc.setText(item.getDescricao() + "\n✅ Vida restaurada! +" + item.getValor());
             }
         } else {
-            // Não achou nada — pode tentar de novo
             labelNarrative.setText("Você vasculhou cuidadosamente, mas não encontrou a página. Tente novamente.");
         }
     }
@@ -347,7 +344,6 @@ public class MissaoController {
         painelItem.setManaged(false);
     }
 
-    // ── FUGIR DA MISSÃO ───────────────────────────────────────────
     @FXML
     private void onFugirMissao() {
         if (!verificarCooldown()) return;
@@ -368,10 +364,29 @@ public class MissaoController {
         pausa.play();
     }
 
-    @FXML private void onInventario() {
+    @FXML
+    private void onInventario() {
         if (!verificarCooldown()) return;
-        ScreenManager.getInstance().salvarEstadoMissao(batalhaAtual, inimigosMortos, moedasSessao, labelNarrative.getText());
-        ScreenManager.getInstance().ir(ScreenManager.TELA_INVENTARIO);
+        salvarPersonagem();
+        ScreenManager.getInstance().salvarEstadoMissao(
+            batalhaAtual, inimigosMortos, moedasSessao, labelNarrative.getText());
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fragmentoparanormal/inventario.fxml"));
+            Parent root = loader.load();
+            Stage stageInv = new Stage();
+            stageInv.setTitle("Inventário");
+            stageInv.setScene(new Scene(root, 960, 640));
+            stageInv.initModality(Modality.APPLICATION_MODAL);
+            stageInv.initOwner(ScreenManager.getInstance().getStage());
+            stageInv.showAndWait();
+            
+            if (ScreenManager.getInstance().temEstadoMissaoSalvo()) {
+                restaurarEstadoMissao();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -381,7 +396,6 @@ public class MissaoController {
         ScreenManager.getInstance().ir(ScreenManager.TELA_DESCANSO);
     }
 
-    // ── BATALHA ───────────────────────────────────────────────────
     @FXML private void onAtacar()      { executarBatalha(AcaoBatalha.ATACAR); }
     @FXML private void onRitual()      { executarBatalha(AcaoBatalha.USAR_RITUAL); }
     @FXML private void onEquiparArma() { executarBatalha(AcaoBatalha.EQUIPAR_ARMA); }
@@ -392,11 +406,11 @@ public class MissaoController {
         if (batalhaAtual == null || !batalhaAtual.isEmAndamento()) return;
 
         int custoStamina = switch (acao) {
-    case ATACAR, EQUIPAR_ARMA -> Personagem.CUSTO_STAMINA_ATACAR;
-    case USAR_RITUAL          -> Personagem.CUSTO_STAMINA_RITUAL;
-    case FUGIR                -> Personagem.CUSTO_STAMINA_FUGIR;
-};
-if (!exigirStamina(custoStamina)) return;
+            case ATACAR, EQUIPAR_ARMA -> Personagem.CUSTO_STAMINA_ATACAR;
+            case USAR_RITUAL          -> Personagem.CUSTO_STAMINA_RITUAL;
+            case FUGIR                -> Personagem.CUSTO_STAMINA_FUGIR;
+        };
+        
         if (!exigirStamina(custoStamina)) return;
         iniciarCooldown();
 
@@ -422,7 +436,6 @@ if (!exigirStamina(custoStamina)) return;
 
     private void processarFimDeBatalha() {
         if (batalhaAtual.jogadorVenceu()) {
-            // Marca a sala como "inimigo derrotado"
             missao.marcarInimigoDerrotado(missao.getSalaAtual());
 
             inimigosMortos++;
@@ -468,15 +481,15 @@ if (!exigirStamina(custoStamina)) return;
             salvarProgresso();
 
         } else if (batalhaAtual.jogadorMorreu()) {
-    SpriteManager.getInstance().animarMorte(imgPersonagem, () -> {
-        missao.setProgressoAtual(0);
-        missao.setSalaAtual(0);
-        missao.setFugiu(false);
-        missao.setVezesRetornou(0);
-        jogador.restaurarVidaTotal();
-        jogador.restaurarStaminaTotal();
-        salvarProgresso();
-        salvarPersonagem();
+            SpriteManager.getInstance().animarMorte(imgPersonagem, () -> {
+                missao.setProgressoAtual(0);
+                missao.setSalaAtual(0);
+                missao.setFugiu(false);
+                missao.setVezesRetornou(0);
+                jogador.restaurarVidaTotal();
+                jogador.restaurarStaminaTotal();
+                salvarProgresso();
+                salvarPersonagem();
                 ScreenManager.getInstance().limparEstadoMissao();
                 try {
                     new RankingDAO().registrarPartida(
@@ -488,12 +501,12 @@ if (!exigirStamina(custoStamina)) return;
             });
 
        } else if (batalhaAtual.jogadorFugiu()) {
-    imgInimigo.setVisible(false);
-    setBatalhaVisivel(false);
-    jogador.recuperarStamina(Personagem.CUSTO_STAMINA_FUGIR / 2);
-    atualizarHUD();
-    labelNarrative.setText("Você fugiu da batalha!");
-}
+            imgInimigo.setVisible(false);
+            setBatalhaVisivel(false);
+            jogador.recuperarStamina(Personagem.CUSTO_STAMINA_FUGIR / 2);
+            atualizarHUD();
+            labelNarrative.setText("Você fugiu da batalha!");
+       }
     }
 
     private void gerarEvento() {
@@ -606,7 +619,7 @@ if (!exigirStamina(custoStamina)) return;
     private void atualizarCenario() {
         if (imgCenarioFundo == null || missao == null) return;
         try {
-            int salaAtual  = Math.max(1, missao.getSalaAtual());
+            int salaAtual = Math.max(1, missao.getSalaAtual());
             int totalSalas = missao.getTotalSalas();
             int idMissao   = missao.getId();
 

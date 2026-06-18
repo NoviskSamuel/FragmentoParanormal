@@ -18,8 +18,6 @@ CREATE TABLE IF NOT EXISTS personagem (
     stamina_atual      INTEGER       NOT NULL DEFAULT 100,
     stamina_atualizada_em TIMESTAMP  NOT NULL DEFAULT NOW()
 );
-
--- Caso a tabela já exista de uma execução anterior sem as colunas novas:
 ALTER TABLE personagem ADD COLUMN IF NOT EXISTS stamina_maxima INTEGER NOT NULL DEFAULT 100;
 ALTER TABLE personagem ADD COLUMN IF NOT EXISTS stamina_atual  INTEGER NOT NULL DEFAULT 100;
 ALTER TABLE personagem ADD COLUMN IF NOT EXISTS stamina_atualizada_em TIMESTAMP NOT NULL DEFAULT NOW();
@@ -80,7 +78,7 @@ CREATE TABLE IF NOT EXISTS historico_partida (
     moedas_ganhas   INTEGER     NOT NULL DEFAULT 0,
     jogado_em       TIMESTAMP    NOT NULL DEFAULT NOW()
 );
-
+/*
 INSERT INTO missao (titulo, descricao, objetivo, total_objetivo, nivel_minimo, total_salas)
 SELECT * FROM (VALUES
     ('A Casa Abandonada',
@@ -105,6 +103,30 @@ SELECT * FROM (VALUES
 ) AS v(titulo, descricao, objetivo, total_objetivo, nivel_minimo, total_salas)
 WHERE NOT EXISTS (SELECT 1 FROM missao WHERE missao.titulo = v.titulo);
 
+		CRIADO COM O NOME ERRADO.
+*/
+
+
+UPDATE missao SET
+    titulo    = 'O Hospital Maldito',
+    descricao = 'Um hospital abandonado esconde segredos de carne e sangue. Corredores encharcados, cheiros de decomposição e algo que ainda respira nos quartos escuros.'
+WHERE id = 1;
+
+UPDATE missao SET
+    titulo    = 'O Cemitério Esquecido',
+    descricao = 'Entre lápides apagadas e necrotérios selados, os mortos parecem não querer descansar. A decomposição tomou conta de cada canto deste lugar.'
+WHERE id = 2;
+
+UPDATE missao SET
+    titulo    = 'A Fábrica Distorcida',
+    descricao = 'Uma fábrica abandonada pulsa com energia corrompida. Máquinas se movem sozinhas, falhas elétricas rasgam o ar e a realidade começa a se distorcer.'
+WHERE id = 3;
+
+UPDATE missao SET
+    titulo    = 'A Biblioteca Proibida',
+    descricao = 'Arquivos secretos, cultos esquecidos e documentos que não deveriam existir. O conhecimento guardado aqui tem um preço — e algo faz questão de cobrar.'
+WHERE id = 4;
+
 INSERT INTO item (nome, tipo, valor, descricao, imagem_path)
 SELECT * FROM (VALUES
     ('Faca Ritual',      'ARMA',       50,  '+5 Força. Lâmina abençoada com ritos antigos.',          NULL),
@@ -120,3 +142,4 @@ CREATE INDEX IF NOT EXISTS idx_personagem_nivel   ON personagem(nivel DESC);
 CREATE INDEX IF NOT EXISTS idx_progresso_personagem ON progresso_missao(personagem_id);
 CREATE INDEX IF NOT EXISTS idx_historico_personagem ON historico_partida(personagem_id);
 CREATE INDEX IF NOT EXISTS idx_upgrade_personagem   ON upgrade(personagem_id);
+

@@ -7,6 +7,10 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -41,4 +45,29 @@ public class RankingController {
     }
 
     @FXML private void onVoltar() { ScreenManager.getInstance().voltar(); }
+    @FXML
+private void onExportar() {
+    FileChooser fc = new FileChooser();
+    fc.setTitle("Exportar Ranking");
+    fc.setInitialFileName("ranking_fragmento_paranormal.csv");
+    fc.getExtensionFilters().add(
+        new FileChooser.ExtensionFilter("CSV", "*.csv"));
+    File arquivo = fc.showSaveDialog(tabelaRanking.getScene().getWindow());
+    if (arquivo == null) return;
+
+    try (PrintWriter pw = new PrintWriter(new FileWriter(arquivo, java.nio.charset.StandardCharsets.UTF_8))) {
+        pw.println("Posicao,Agente,Nivel,Moedas,Inimigos Abatidos");
+        for (Ranking r : tabelaRanking.getItems()) {
+            pw.printf("%d,%s,%d,%d,%d%n",
+                r.getPosicao(),
+                r.getNomeJogador(),
+                r.getNivel(),
+                r.getMoedasTotais(),
+                r.getInimigosAbatidos());
+        }
+        labelErro.setText("✅ Exportado: " + arquivo.getName());
+    } catch (Exception e) {
+        labelErro.setText("Erro ao exportar: " + e.getMessage());
+    }
+}
 }
