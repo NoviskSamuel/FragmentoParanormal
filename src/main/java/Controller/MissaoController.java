@@ -639,4 +639,6 @@ public class MissaoController {
         try { new PersonagemDAO().atualizar(jogador); }
         catch (SQLException e) { System.err.println("Erro ao salvar personagem: " + e.getMessage()); }
     }
+    
+    
 }

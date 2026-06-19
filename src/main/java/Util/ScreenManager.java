@@ -222,5 +222,5 @@ public class ScreenManager {
         } catch (IOException e) {
             throw new RuntimeException("Falha ao abrir inventário em janela própria.", e);
         }
-}
+    }
 }
