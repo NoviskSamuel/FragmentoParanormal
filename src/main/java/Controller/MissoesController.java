@@ -81,6 +81,12 @@ public class MissoesController {
         ScreenManager.getInstance().setMissaoAtiva(escolhida);
         ScreenManager.getInstance().ir(ScreenManager.TELA_MISSAO);
     }
+    
+    @FXML
+private void onLoja() {
+    System.out.println("Abrindo a loja...");
+    ScreenManager.getInstance().ir(ScreenManager.TELA_LOJA);
+}
 
     @FXML
     private void onSair() {
