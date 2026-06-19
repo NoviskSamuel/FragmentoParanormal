@@ -250,4 +250,73 @@ public class DescansoController {
             System.err.println("Erro ao salvar stamina: " + e.getMessage());
         }
     }
+    
+    // ── LOJA ──────────────────────────────────────────────────────
+    @FXML
+    private void onAbrirLoja() {
+        if (exibindoSequencia || finalizando) {
+            labelFeedback.setText("Termine o descanso antes de ir à loja.");
+            return;
+        }
+
+        // Itens disponíveis na loja com seus preços
+        record ItemLoja(String nome, String tipo, int valor, String desc, int preco) {}
+        java.util.List<ItemLoja> catalogo = java.util.List.of(
+            new ItemLoja("Poção de Ervas",     "POCAO",    30, "Restaura 30 pontos de vida.",          20),
+            new ItemLoja("Poção Avançada",     "POCAO",    60, "Restaura 60 pontos de vida.",          45),
+            new ItemLoja("Faca Enferrujada",   "ARMA",      8, "Uma faca velha mas ainda cortante.",   30),
+            new ItemLoja("Amuleto Sombrio",    "RITUAL",   12, "Amplifica rituais paranormais.",       35)
+        );
+
+        // Monta o texto do menu
+        StringBuilder menu = new StringBuilder();
+        menu.append("🛒  LOJA DO AGENTE\n");
+        menu.append("💰 Moedas: ").append(jogador.getMoedas()).append("\n\n");
+        for (int i = 0; i < catalogo.size(); i++) {
+            ItemLoja il = catalogo.get(i);
+            menu.append((i + 1)).append(") ").append(il.nome())
+                .append(" — ").append(il.preco()).append(" 🪙\n");
+        }
+        menu.append("\nDigite o número do item (ou 0 para sair):");
+
+        javafx.scene.control.TextInputDialog dialog = new javafx.scene.control.TextInputDialog("0");
+        dialog.setTitle("Loja — Fragmento Paranormal");
+        dialog.setHeaderText(menu.toString());
+        dialog.setContentText("Escolha:");
+        dialog.initOwner(imgPersonagem.getScene().getWindow());
+
+        dialog.showAndWait().ifPresent(entrada -> {
+            try {
+                int escolha = Integer.parseInt(entrada.trim());
+                if (escolha <= 0 || escolha > catalogo.size()) {
+                    labelFeedback.setText("Você saiu da loja sem comprar nada.");
+                    return;
+                }
+                ItemLoja sel = catalogo.get(escolha - 1);
+                processarCompra(sel.nome(), sel.tipo(), sel.valor(), sel.desc(), sel.preco());
+            } catch (NumberFormatException e) {
+                labelFeedback.setText("Entrada inválida.");
+            }
+        });
+    }
+
+    private void processarCompra(String nome, String tipo, int valor, String desc, int preco) {
+        if (jogador.getMoedas() < preco) {
+            labelFeedback.setText("❌ Moedas insuficientes! Você tem " + jogador.getMoedas() + " 🪙.");
+            return;
+        }
+        jogador.setMoedas(jogador.getMoedas() - preco);
+        Model.Item item = new Model.Item(nome, tipo, valor, desc);
+        jogador.getInventario().adicionarItem(item);
+
+        // Aplica poção imediatamente se quiser usar agora
+        if (item.isPocao()) {
+            jogador.curar(valor);
+            atualizarHUD();
+            labelFeedback.setText("✅ Comprou " + nome + " (-" + preco + " 🪙) e usou! +" + valor + " HP.");
+        } else {
+            labelFeedback.setText("✅ Comprou " + nome + " (-" + preco + " 🪙). Adicionado ao inventário.");
+        }
+        salvarPersonagem();
+    }
 }

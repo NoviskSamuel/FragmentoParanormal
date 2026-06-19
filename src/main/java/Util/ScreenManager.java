@@ -6,6 +6,7 @@ import Model.Personagem;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -172,7 +173,7 @@ public class ScreenManager {
         limparEstadoMissao();
     }
     
-     public String getCaminhoCenarioAtual() {
+    public String getCaminhoCenarioAtual() {
         Missao missaoAtiva = getMissaoAtiva();
         if (missaoAtiva == null) {
             return "/fragmentoparanormal/images/ui/placeholder.png"; 
@@ -198,5 +199,28 @@ public class ScreenManager {
 
         // Fallback genérico para outras missões que você criar depois
         return "/fragmentoparanormal/images/ui/placeholder.png";
-    }
+    } // <- Fecha corretamente o getCaminhoCenarioAtual
+        
+    public void abrirInventarioComoJanela() {
+        try {
+            URL url = ScreenManager.class.getResource("/fragmentoparanormal/inventario.fxml");
+            if (url == null) throw new IOException("inventario.fxml não encontrado.");
+            Parent root = new FXMLLoader(url).load();
+
+            Stage janelaInventario = new Stage();
+            janelaInventario.setTitle("Inventário — Fragmento Paranormal");
+            janelaInventario.initOwner(stage);
+            janelaInventario.initModality(Modality.WINDOW_MODAL);
+
+            Scene cena = new Scene(root, 960, 640);
+            if (scene != null && !scene.getStylesheets().isEmpty()) {
+                cena.getStylesheets().addAll(scene.getStylesheets());
+            }
+            janelaInventario.setScene(cena);
+            janelaInventario.setResizable(false);
+            janelaInventario.showAndWait(); // bloqueia a janela principal até fechar
+        } catch (IOException e) {
+            throw new RuntimeException("Falha ao abrir inventário em janela própria.", e);
+        }
+}
 }

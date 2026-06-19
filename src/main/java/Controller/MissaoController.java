@@ -369,10 +369,10 @@ public class MissaoController {
     }
 
     @FXML private void onInventario() {
-        if (!verificarCooldown()) return;
-        ScreenManager.getInstance().salvarEstadoMissao(batalhaAtual, inimigosMortos, moedasSessao, labelNarrative.getText());
-        ScreenManager.getInstance().ir(ScreenManager.TELA_INVENTARIO);
-    }
+    if (!verificarCooldown()) return;
+    ScreenManager.getInstance().salvarEstadoMissao(batalhaAtual, inimigosMortos, moedasSessao, labelNarrative.getText());
+    ScreenManager.getInstance().abrirInventarioComoJanela(); // <- era .ir(TELA_INVENTARIO)
+}
 
     @FXML
     private void onDescansar() {
@@ -396,8 +396,7 @@ public class MissaoController {
     case USAR_RITUAL          -> Personagem.CUSTO_STAMINA_RITUAL;
     case FUGIR                -> Personagem.CUSTO_STAMINA_FUGIR;
 };
-if (!exigirStamina(custoStamina)) return;
-        if (!exigirStamina(custoStamina)) return;
+    if (!exigirStamina(custoStamina)) return;
         iniciarCooldown();
 
         SpriteManager.getInstance().animarAtaque(imgPersonagem, null);

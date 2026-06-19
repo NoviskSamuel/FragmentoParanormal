@@ -68,9 +68,14 @@
                        styleClass="label-desc"
                        style="-fx-text-fill: #554422; -fx-font-size: 12px;"/>
 
-                <Button fx:id="btnPular" text="PULAR DESCANSO"
-                        onAction="#onPular" styleClass="btn-fuga"
-                        style="-fx-min-width: 180px;"/>
+                <HBox alignment="CENTER" spacing="16">
+                    <Button fx:id="btnPular" text="PULAR DESCANSO"
+                            onAction="#onPular" styleClass="btn-fuga"
+                            style="-fx-min-width: 180px;"/>
+                    <Button text="🛒 LOJA"
+                            onAction="#onAbrirLoja" styleClass="btn-acao"
+                            style="-fx-min-width: 140px;"/>
+                </HBox>
             </VBox>
 
         </HBox>

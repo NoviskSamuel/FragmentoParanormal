@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -225,5 +226,8 @@ public class InventarioController {
         }
     }
 
-    @FXML private void onVoltar() { ScreenManager.getInstance().voltar(); }
+    @FXML private void onVoltar() {
+    Stage stage = (Stage) listaItens.getScene().getWindow();
+    stage.close();
+}
 }

@@ -1,6 +1,7 @@
 package Controller;
 
 import Dao.PersonagemDAO;
+import Dao.UpgradeDAO;
 import Model.Personagem;
 import Util.ScreenManager;
 import javafx.fxml.FXML;
@@ -42,10 +43,10 @@ public class LevelUpController {
         labelPontosRestantes.setText("Pontos restantes: " + pontosRestantes);
     }
 
-    @FXML private void onUpForca()         { gastar("forca"); }
-    @FXML private void onUpPoder()         { gastar("poder"); }
-    @FXML private void onUpInvestigacao()  { gastar("investigacao"); }
-    @FXML private void onUpVida()          { gastar("vida"); }
+    @FXML private void onUpForca()        { gastar("forca"); }
+    @FXML private void onUpPoder()        { gastar("poder"); }
+    @FXML private void onUpInvestigacao() { gastar("investigacao"); }
+    @FXML private void onUpVida()         { gastar("vida"); }
 
     private void gastar(String atributo) {
         if (pontosRestantes <= 0 || jogador == null) return;
@@ -75,7 +76,6 @@ public class LevelUpController {
             case "vida"         -> investidoVida         > 0;
             default             -> false;
         };
-        
         if (!podeDevolver) return;
 
         switch (atributo) {
@@ -96,7 +96,15 @@ public class LevelUpController {
     @FXML
     private void onConfirmar() {
         if (jogador != null) {
-            try { new PersonagemDAO().atualizar(jogador); } catch (SQLException ignored) {}
+            try {
+                new PersonagemDAO().atualizar(jogador);
+                // Registra cada upgrade no banco — UpgradeDAO sendo chamado aqui
+                UpgradeDAO upgradeDao = new UpgradeDAO();
+                if (investidoForca        > 0) upgradeDao.registrarUpgrade(jogador.getId(), "forca",        investidoForca);
+                if (investidoPoder        > 0) upgradeDao.registrarUpgrade(jogador.getId(), "poder",        investidoPoder);
+                if (investidoInvestigacao > 0) upgradeDao.registrarUpgrade(jogador.getId(), "investigacao", investidoInvestigacao);
+                if (investidoVida         > 0) upgradeDao.registrarUpgrade(jogador.getId(), "vida",         investidoVida);
+            } catch (SQLException ignored) {}
         }
         ScreenManager.getInstance().irSemHistorico(ScreenManager.TELA_MISSOES);
     }
