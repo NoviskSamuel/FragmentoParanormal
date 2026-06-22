@@ -30,13 +30,12 @@ public class MissaoDAO {
                 while (rs.next()) {
                     Missao m = mapear(rs);
                     m.setProgressoAtual(rs.getInt("progresso_atual"));
-                    m.setSalaAtual(rs.getInt("sala_atual"));
-                    m.setConcluida(rs.getBoolean("concluida"));
-                    m.setVezesRetornou(rs.getInt("vezes_retornou"));
-                    m.setFugiu(rs.getBoolean("fugiu"));
-                    lista.add(m);
-                    m.restaurarPaginasDoProgresso();
-                    lista.add(m);
+            m.setSalaAtual(rs.getInt("sala_atual"));
+            m.setConcluida(rs.getBoolean("concluida"));
+            m.setVezesRetornou(rs.getInt("vezes_retornou"));
+            m.setFugiu(rs.getBoolean("fugiu"));
+            m.restaurarPaginasDoProgresso();
+            lista.add(m);
                 }
             }
         }

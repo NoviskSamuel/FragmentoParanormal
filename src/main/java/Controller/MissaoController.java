@@ -268,22 +268,22 @@ public class MissaoController {
         int roll = RAND.nextInt(100);
 
         if (roll < chanceFragmento) {
-            // Achou a página — marca o local e bloqueia investigação
-            missao.marcarPaginaEncontrada();
-            missao.marcarSalaInvestigada(missao.getSalaAtual());
+    // Achou o fragmento — marca PRIMEIRO, depois lê o progresso atualizado
+    missao.marcarPaginaEncontrada();
+    missao.marcarSalaInvestigada(missao.getSalaAtual());
 
-            Item pagina = new Item("Fragmento do Diário", "FRAGMENTO", 0,
-                    "Página " + (missao.getProgressoAtual()) + " — " + getNomePaginaAtual());
-            jogador.getInventario().adicionarItem(pagina);
+    Item fragmento = new Item("Fragmento do Diário", "FRAGMENTO", 0,
+            "Fragmento " + missao.getProgressoAtual() + " — " + getNomePaginaAtual());
+    jogador.getInventario().adicionarItem(fragmento);
 
-            atualizarHUD();
-            atualizarInfoLocal();
-            labelItemEncontrado.setText("📜 Página encontrada!");
-            labelItemDesc.setText(pagina.getDescricao()
-                    + "\n\n" + missao.getProgressoTexto() + " páginas coletadas.");
-            painelItem.setVisible(true);
-            painelItem.setManaged(true);
-            verificarConclusao();
+    atualizarHUD();
+    atualizarInfoLocal();
+    labelItemEncontrado.setText("📜 Fragmento encontrado!");
+    labelItemDesc.setText(fragmento.getDescricao()
+            + "\n\n" + missao.getProgressoTexto() + " fragmentos coletados.");
+    painelItem.setVisible(true);
+    painelItem.setManaged(true);
+    verificarConclusao();
 
         } else if (roll < chanceFragmento + 25) {
             // Achou item secundário (poção/arma) — pode continuar investigando
@@ -391,12 +391,12 @@ public class MissaoController {
         if (!verificarCooldown()) return;
         if (batalhaAtual == null || !batalhaAtual.isEmAndamento()) return;
 
-        int custoStamina = switch (acao) {
+       int custoStamina = switch (acao) {
     case ATACAR, EQUIPAR_ARMA -> Personagem.CUSTO_STAMINA_ATACAR;
     case USAR_RITUAL          -> Personagem.CUSTO_STAMINA_RITUAL;
     case FUGIR                -> Personagem.CUSTO_STAMINA_FUGIR;
 };
-    if (!exigirStamina(custoStamina)) return;
+if (!exigirStamina(custoStamina)) return;
         iniciarCooldown();
 
         SpriteManager.getInstance().animarAtaque(imgPersonagem, null);
